@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ship It"
+  short_description: "Ship every repository change without gates"
+  default_prompt: "Use $ship-it to sync this repository, make the requested changes, and ship everything."
