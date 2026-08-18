@@ -15,8 +15,8 @@ const marker = "SHIP_IT_SKILL"
 
 const openAIYAML = `interface:
   display_name: "Ship It"
-  short_description: "Ship every repository change without gates"
-  default_prompt: "Use $ship-it to sync this repository, make the requested changes, and ship everything."
+  short_description: "Ship changes and hand off explicit deployments"
+  default_prompt: "Use $ship-it to sync this repository, make the requested changes, verify them once, ship everything, and hand the shipped revision to deploy-it."
 `
 
 func main() {

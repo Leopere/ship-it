@@ -8,13 +8,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Leopere/ship-it/internal/deploy"
 	"github.com/Leopere/ship-it/internal/gitx"
 	installer "github.com/Leopere/ship-it/internal/install"
 	"github.com/Leopere/ship-it/internal/skilldoc"
 	updater "github.com/Leopere/ship-it/internal/update"
 )
 
-const usage = `ship-it ships every local Git change without gates.
+const usage = `ship-it ships every local Git change, then hands it to deploy-it.
 
 Usage:
   ship-it [message...]
@@ -113,8 +114,16 @@ func runShip(args []string, version string, out, errOut io.Writer) error {
 	if err != nil {
 		return err
 	}
-	_, err = repo.Ship(gitx.ShipOptions{Branch: destination, Message: message, NoTag: *noTag})
-	return err
+	result, err := repo.Ship(gitx.ShipOptions{Branch: destination, Message: message, NoTag: *noTag})
+	if err != nil {
+		return err
+	}
+	return deploy.Run(repo.Root, deploy.ShippedRevision{
+		Remote: repo.Remote,
+		Branch: result.Branch,
+		Commit: result.Commit,
+		Tag:    result.Tag,
+	}, out, errOut)
 }
 
 func runInstall(args []string, out io.Writer) error {
