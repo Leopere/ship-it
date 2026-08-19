@@ -45,3 +45,18 @@ func TestGeneratedSkillMatchesRepositoryCopy(t *testing.T) {
 		t.Fatal("embedded skill drifted from the canonical Go comment; run go generate ./internal/skilldoc")
 	}
 }
+
+func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) {
+	for _, required := range []string{
+		"Activate migration work only when that host appears",
+		"private repository",
+		"`ghcr.io` image targets",
+		"visible production acceptance result",
+		"Each run must include every repository change",
+		"verified, production-safe checkpoint",
+	} {
+		if !strings.Contains(SkillMD, required) {
+			t.Errorf("skill is missing %q", required)
+		}
+	}
+}
