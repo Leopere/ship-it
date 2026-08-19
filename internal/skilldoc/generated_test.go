@@ -48,6 +48,8 @@ func TestGeneratedSkillMatchesRepositoryCopy(t *testing.T) {
 
 func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) {
 	for _, required := range []string{
+		"main and final delivery path for every repository work cycle",
+		"the cycle is not complete until `ship-it` resolves the repository",
 		"Activate migration work only when that host appears",
 		"private repository",
 		"`ghcr.io` image targets",
@@ -57,6 +59,14 @@ func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) 
 	} {
 		if !strings.Contains(SkillMD, required) {
 			t.Errorf("skill is missing %q", required)
+		}
+	}
+	for _, required := range []string{
+		"Finalize every repository cycle and deploy",
+		"required start and finalizer for this repository cycle",
+	} {
+		if !strings.Contains(OpenAIYAML, required) {
+			t.Errorf("OpenAI metadata is missing %q", required)
 		}
 	}
 }
