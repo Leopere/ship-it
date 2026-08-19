@@ -56,6 +56,7 @@ func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) 
 		"visible production acceptance result",
 		"Each run must include every repository change",
 		"verified, production-safe checkpoint",
+		"In Cursor, wrapping a prompt",
 	} {
 		if !strings.Contains(SkillMD, required) {
 			t.Errorf("skill is missing %q", required)

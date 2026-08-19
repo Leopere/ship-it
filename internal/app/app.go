@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Leopere/ship-it/internal/cursorhook"
 	"github.com/Leopere/ship-it/internal/deploy"
 	"github.com/Leopere/ship-it/internal/gitx"
 	installer "github.com/Leopere/ship-it/internal/install"
@@ -24,6 +25,7 @@ Usage:
   ship-it update
   ship-it version
   ship-it skill
+  ship-it cursor-hook
 
 Ship options:
   -m, --message text   explicit commit message
@@ -55,6 +57,8 @@ func Run(args []string, version string, out, errOut io.Writer) error {
 			return runInstall(args[1:], out)
 		case "start":
 			return runStart(args[1:], version, args, out, errOut)
+		case "cursor-hook":
+			return cursorhook.Handle(os.Stdin, out)
 		}
 	}
 	return runShip(args, version, out, errOut)

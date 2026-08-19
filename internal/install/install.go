@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Leopere/ship-it/internal/cursorhook"
 	"github.com/Leopere/ship-it/internal/skilldoc"
 )
 
@@ -32,7 +33,11 @@ func Local(copyBinary bool, out io.Writer) error {
 		}
 		fmt.Fprintln(out, "Installed", dest)
 	}
-	for _, base := range []string{filepath.Join(home, ".codex", "skills"), filepath.Join(home, ".claude", "skills")} {
+	for _, base := range []string{
+		filepath.Join(home, ".codex", "skills"),
+		filepath.Join(home, ".claude", "skills"),
+		filepath.Join(home, ".cursor", "skills"),
+	} {
 		if err := retireEnsureShip(base, home); err != nil {
 			return err
 		}
@@ -48,7 +53,10 @@ func Local(copyBinary bool, out io.Writer) error {
 		}
 		deconflictRepeatable(filepath.Join(base, "repeatable-dev-ship", "SKILL.md"))
 	}
-	fmt.Fprintln(out, "Installed the ship-it skill for Codex and Claude.")
+	if err := cursorhook.Install(home, out); err != nil {
+		return err
+	}
+	fmt.Fprintln(out, "Installed the ship-it skill for Codex, Claude, and Cursor.")
 	return nil
 }
 

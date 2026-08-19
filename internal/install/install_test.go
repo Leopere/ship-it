@@ -32,7 +32,7 @@ func TestLocalInstallsBothSkillsAndRetiresEnsureShip(t *testing.T) {
 	if err := Local(false, &out); err != nil {
 		t.Fatal(err)
 	}
-	for _, agent := range []string{".codex", ".claude"} {
+	for _, agent := range []string{".codex", ".claude", ".cursor"} {
 		path := filepath.Join(home, agent, "skills", "ship-it", "SKILL.md")
 		data, err := os.ReadFile(path)
 		if err != nil {
@@ -51,5 +51,12 @@ func TestLocalInstallsBothSkillsAndRetiresEnsureShip(t *testing.T) {
 	}
 	if len(entries) != 1 || !strings.HasPrefix(entries[0].Name(), "claude-ensure-ship-") {
 		t.Fatalf("retired entries=%v", entries)
+	}
+	hooks, err := os.ReadFile(filepath.Join(home, ".cursor", "hooks.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(hooks), "ship-it cursor-hook") {
+		t.Fatalf("hooks.json missing cursor-hook: %s", hooks)
 	}
 }
