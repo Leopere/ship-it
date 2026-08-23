@@ -111,6 +111,9 @@ func runShip(args []string, version string, out, errOut io.Writer) error {
 	if err := updater.Maybe(version, args, out); err != nil {
 		return err
 	}
+	if err := repo.ValidateNoGitHubHostedRunners(); err != nil {
+		return err
+	}
 	if _, err := repo.EnsureWrapper(); err != nil {
 		return err
 	}

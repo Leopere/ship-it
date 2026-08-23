@@ -101,6 +101,41 @@ func (r *Repo) EnsureWrapper() (string, error) {
 	return backup, nil
 }
 
+func (r *Repo) ValidateNoGitHubHostedRunners() error {
+	out, err := r.output("ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", ".github/workflows")
+	if err != nil {
+		return fmt.Errorf("inspect GitHub Actions workflows: %w", err)
+	}
+	var violations []string
+	for _, path := range strings.Split(out, "\x00") {
+		if path == "" || (filepath.Ext(path) != ".yml" && filepath.Ext(path) != ".yaml") {
+			continue
+		}
+		data, readErr := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(path)))
+		if os.IsNotExist(readErr) {
+			continue
+		}
+		if readErr != nil {
+			return fmt.Errorf("inspect GitHub Actions workflow %s: %w", path, readErr)
+		}
+		findings, validateErr := hostedRunnerFindings(data)
+		if validateErr != nil {
+			return fmt.Errorf("validate GitHub Actions workflow %s: %w", path, validateErr)
+		}
+		for _, finding := range findings {
+			violations = append(violations, fmt.Sprintf("%s:%d: job %s selects %s", path, finding.Line, finding.Job, finding.Selection))
+		}
+	}
+	if len(violations) == 0 {
+		return nil
+	}
+	sort.Strings(violations)
+	return fmt.Errorf(
+		"shipping blocked: every GitHub Actions job must explicitly use self-hosted infrastructure such as [self-hosted, Linux, ARM64, leopere, local]: %s",
+		strings.Join(violations, ", "),
+	)
+}
+
 func (r *Repo) Start(branch string) error {
 	if err := r.finishMerge(); err != nil {
 		return err
@@ -135,6 +170,9 @@ type Result struct {
 }
 
 func (r *Repo) Ship(opts ShipOptions) (Result, error) {
+	if err := r.ValidateNoGitHubHostedRunners(); err != nil {
+		return Result{}, err
+	}
 	if err := r.finishMerge(); err != nil {
 		return Result{}, err
 	}

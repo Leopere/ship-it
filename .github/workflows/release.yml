@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, ARM64, leopere, local]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -19,7 +19,7 @@ jobs:
       - run: go test -race ./...
   release:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, ARM64, leopere, local]
     strategy:
       matrix:
         include:
@@ -52,7 +52,7 @@ jobs:
           path: dist/*.tar.gz
   publish:
     needs: release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, ARM64, leopere, local]
     permissions:
       contents: write
     steps:
@@ -61,6 +61,10 @@ jobs:
           pattern: ship-it-*
           merge-multiple: true
           path: dist
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
       - name: Checksums
         working-directory: dist
         run: sha256sum *.tar.gz > checksums.txt
