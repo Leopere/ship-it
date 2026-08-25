@@ -106,7 +106,8 @@ func (r *Repo) ValidateNoGitHubHostedRunners() error {
 	if err != nil {
 		return fmt.Errorf("inspect GitHub Actions workflows: %w", err)
 	}
-	var violations []string
+	workflowData := make(map[string][]byte)
+	localWorkflows := make(map[string]struct{})
 	for _, path := range strings.Split(out, "\x00") {
 		if path == "" || (filepath.Ext(path) != ".yml" && filepath.Ext(path) != ".yaml") {
 			continue
@@ -118,7 +119,12 @@ func (r *Repo) ValidateNoGitHubHostedRunners() error {
 		if readErr != nil {
 			return fmt.Errorf("inspect GitHub Actions workflow %s: %w", path, readErr)
 		}
-		findings, validateErr := hostedRunnerFindings(data)
+		workflowData[path] = data
+		localWorkflows[path] = struct{}{}
+	}
+	var violations []string
+	for path, data := range workflowData {
+		findings, validateErr := hostedRunnerFindings(data, localWorkflows)
 		if validateErr != nil {
 			return fmt.Errorf("validate GitHub Actions workflow %s: %w", path, validateErr)
 		}
@@ -131,7 +137,7 @@ func (r *Repo) ValidateNoGitHubHostedRunners() error {
 	}
 	sort.Strings(violations)
 	return fmt.Errorf(
-		"shipping blocked: every GitHub Actions job must explicitly use self-hosted infrastructure such as [self-hosted, Linux, ARM64, leopere, local]: %s",
+		"shipping blocked: every GitHub Actions job must use a documented self-hosted local runner label profile or an existing local reusable workflow: %s",
 		strings.Join(violations, ", "),
 	)
 }
@@ -234,6 +240,9 @@ func (r *Repo) Ship(opts ShipOptions) (Result, error) {
 	head = strings.TrimSpace(head)
 	remoteHead, _ := r.output("rev-parse", remoteRef)
 	if head == strings.TrimSpace(remoteHead) {
+		if err := r.ValidateNoGitHubHostedRunners(); err != nil {
+			return Result{}, err
+		}
 		fmt.Fprintln(r.Out, "Already shipped.")
 		return Result{Branch: opts.Branch, Commit: head, Noop: true}, nil
 	}
@@ -244,6 +253,9 @@ func (r *Repo) Ship(opts ShipOptions) (Result, error) {
 	}
 	var tag string
 	for attempt := 1; attempt <= 3; attempt++ {
+		if err := r.ValidateNoGitHubHostedRunners(); err != nil {
+			return Result{}, err
+		}
 		if !opts.NoTag {
 			tag, err = r.nextTag(now)
 			if err != nil {
