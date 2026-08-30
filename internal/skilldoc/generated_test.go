@@ -82,4 +82,7 @@ func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) 
 			t.Errorf("OpenAI metadata is missing %q", required)
 		}
 	}
+	if strings.Contains(SkillMD, "deploy-it trust") || !strings.Contains(SkillMD, "does not require a machine-local trust record") {
+		t.Error("skill still requires the deleted deploy-it trust gate")
+	}
 }
