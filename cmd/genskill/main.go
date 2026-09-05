@@ -16,7 +16,7 @@ const marker = "SHIP_IT_SKILL"
 const openAIYAML = `interface:
   display_name: "Ship It"
   short_description: "Finalize every repository cycle and deploy"
-  default_prompt: "Use $ship-it as the required start and finalizer for this repository cycle: sync first, make and verify the requested changes, then ship every change and complete the deploy-it handoff."
+  default_prompt: "Use the ship-it SessionStart and Stop hooks: initialize once at the beginning of the local workday, then ship verified repository changes at the actual end of work."
 `
 
 func main() {

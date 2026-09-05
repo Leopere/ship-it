@@ -48,8 +48,10 @@ func TestGeneratedSkillMatchesRepositoryCopy(t *testing.T) {
 
 func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) {
 	for _, required := range []string{
-		"main and final delivery path for every repository work cycle",
-		"the cycle is not complete until `ship-it` resolves the repository",
+		"SessionStart hook runs `ship-it start` once at the beginning of the local workday",
+		"Agents do not run `ship-it start`",
+		"Stop hook invokes `ship-it` with no arguments",
+		"Agents do not run `ship-it`, poll the hook, or retry it",
 		"Activate migration work only when either host appears",
 		"`woodpecker.nixc.us`",
 		"exact private GitHub owner and repository",
@@ -66,9 +68,8 @@ func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) 
 		"Recheck the final merged tree before a no-op handoff or push",
 		"There is no billing-based fallback, public-runner fallback, or hosted-runner exception",
 		"visible production acceptance result",
-		"Each run must include every repository change",
-		"verified, production-safe checkpoint",
-		"In Cursor, wrapping a prompt",
+		"Each hook run includes every repository change",
+		"Prompt completion, urgent checkpoints, and intermediate turns do not initiate shipping",
 	} {
 		if !strings.Contains(SkillMD, required) {
 			t.Errorf("skill is missing %q", required)
@@ -76,7 +77,7 @@ func TestSkillIncludesConditionalMigrationAndSafeShippingSteering(t *testing.T) 
 	}
 	for _, required := range []string{
 		"Finalize every repository cycle and deploy",
-		"required start and finalizer for this repository cycle",
+		"initialize once at the beginning of the local workday",
 	} {
 		if !strings.Contains(OpenAIYAML, required) {
 			t.Errorf("OpenAI metadata is missing %q", required)
