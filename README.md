@@ -10,4 +10,8 @@ Run `ship-it install` once to install the binary, skill, and lifecycle hooks. Ro
 
 The hooks use the repository paths in their event payloads. Hook stdout stays valid JSON. Each run saves command output as it arrives in a private log under `~/.local/share/ship-it/hooks/`, with an explicit completion or failure record. Failed synchronous hooks also report their diagnostics on stderr. The Codex Stop timeout allows ten minutes for Git delivery and the bounded deployment command.
 
+When one-shot-tally observes an explicit native edit in another repository, Stop also includes that repository. Read-only access does not select a repository. Pending delivery survives a failed deployment even when Git is clean. One continuation retry is allowed for an unchanged failed edit; a new turn or edit can retry again. A successful delivery clears only its captured edit generation and exact clean revision. SessionStart keeps its original repository scope.
+
+The registry uses the native session ID. Historical edits made before installation, opaque shell edits outside the known roots, and child sessions with a different ID are not inferred. A kernel file lock protects registry updates; it does not claim to deduplicate concurrent initial Stop events.
+
 Existing tabs can retain the old `ship-it hook` or `ship-it cursor-hook` Stop handler with a five-second timeout. Those legacy handlers start the same no-argument binary in a separate process session and return the result-log path immediately. The log records the eventual outcome; the queued message does not claim that delivery succeeded. New sessions continue to use the installed no-argument hooks.

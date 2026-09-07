@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -86,7 +85,6 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 		roots = append(roots, mapRoots(touchedRoots)...)
 	}
 	if mode == workday.Stop && event.StopHookActive {
-		touchedRoots = touchedDeliveryRootsForTurn(event.SessionID, event.TurnID)
 		roots = continuationRoots(event)
 		if err := updateDeliveryRetry(event, nil); err != nil {
 			return fmt.Errorf("consume delivery retry: %w", err)
@@ -285,7 +283,11 @@ func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.W
 		if hasTrashComponent(root) {
 			continue
 		}
-		repo, err := gitx.Open(root, out, errOut)
+		safeRoot, ok := permittedExistingAncestor(root, 0)
+		if !ok {
+			continue
+		}
+		repo, err := gitx.Open(safeRoot, out, errOut)
 		if err != nil {
 			failures = append(failures, fmt.Errorf("%s: %w", root, err))
 			if observe != nil {
@@ -293,15 +295,8 @@ func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.W
 			}
 			continue
 		}
-		if hasTrashComponent(repo.Root) {
-			continue
-		}
-		canonicalRoot, err := filepath.EvalSymlinks(repo.Root)
-		if err != nil {
-			failures = append(failures, fmt.Errorf("%s: %w", root, err))
-			if observe != nil {
-				observe(root, repo, err)
-			}
+		canonicalRoot, ok := permittedExistingAncestor(repo.Root, 0)
+		if !ok || hasTrashComponent(canonicalRoot) {
 			continue
 		}
 		if _, alreadyRan := seen[canonicalRoot]; alreadyRan {

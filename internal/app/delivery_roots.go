@@ -1,15 +1,16 @@
 package app
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -135,13 +136,9 @@ func finalizeTouchedRoots(sessionID, turnID string, delivered, failed map[string
 		return err
 	}
 	for recordedRoot, recordedGeneration := range registry.Roots {
-		canonical, ok := canonicalTouchedRoot(recordedRoot)
-		if !ok {
-			continue
-		}
-		if deliveredGeneration, delivered := delivered[canonical]; delivered && recordedGeneration <= deliveredGeneration {
+		if deliveredGeneration, delivered := delivered[recordedRoot]; delivered && recordedGeneration <= deliveredGeneration {
 			delete(registry.Roots, recordedRoot)
-			delete(registry.Attempts, canonical)
+			delete(registry.Attempts, recordedRoot)
 		}
 	}
 	for root, generation := range failed {
@@ -178,41 +175,29 @@ func finalizeTouchedRoots(sessionID, turnID string, delivered, failed map[string
 }
 
 func acquireDeliveryRootLock(path string) (func() error, error) {
-	lockPath := path + ".lock"
+	lock, err := os.OpenFile(path+".lock", os.O_CREATE|os.O_RDWR, 0o600)
+	if err != nil {
+		return nil, err
+	}
 	deadline := time.Now().Add(1500 * time.Millisecond)
 	for {
-		lock, err := os.OpenFile(lockPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+		err = syscall.Flock(int(lock.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 		if err == nil {
-			token := fmt.Sprintf("%d-%d", os.Getpid(), time.Now().UnixNano())
-			if _, writeErr := lock.WriteString(token); writeErr != nil {
-				_ = lock.Close()
-				_ = os.Remove(lockPath)
-				return nil, writeErr
-			}
-			if closeErr := lock.Close(); closeErr != nil {
-				_ = os.Remove(lockPath)
-				return nil, closeErr
-			}
 			return func() error {
-				data, readErr := os.ReadFile(lockPath)
-				if errors.Is(readErr, os.ErrNotExist) {
-					return nil
+				unlockErr := syscall.Flock(int(lock.Fd()), syscall.LOCK_UN)
+				closeErr := lock.Close()
+				if unlockErr != nil {
+					return unlockErr
 				}
-				if readErr != nil || string(data) != token {
-					return readErr
-				}
-				return os.Remove(lockPath)
+				return closeErr
 			}, nil
 		}
-		if !errors.Is(err, os.ErrExist) {
+		if err != syscall.EWOULDBLOCK && err != syscall.EAGAIN {
+			_ = lock.Close()
 			return nil, err
 		}
-		info, statErr := os.Stat(lockPath)
-		if statErr == nil && time.Since(info.ModTime()) > time.Second {
-			_ = os.Remove(lockPath)
-			continue
-		}
 		if time.Now().After(deadline) {
+			_ = lock.Close()
 			return nil, errors.New("timed out waiting for touched root registry")
 		}
 		time.Sleep(5 * time.Millisecond)
@@ -224,7 +209,14 @@ func canonicalTouchedRoot(root string) (string, bool) {
 	if root == "" || hasTrashComponent(root) {
 		return "", false
 	}
-	output, err := exec.Command("git", "-C", root, "rev-parse", "--show-toplevel").Output()
+	root, ok := permittedExistingAncestor(root, 0)
+	if !ok {
+		return "", false
+	}
+	resolvedRoot := root
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	output, err := exec.CommandContext(ctx, "git", "-C", root, "rev-parse", "--show-toplevel").Output()
 	if err != nil {
 		return "", false
 	}
@@ -232,17 +224,54 @@ func canonicalTouchedRoot(root string) (string, bool) {
 	if root == "" || hasTrashComponent(root) {
 		return "", false
 	}
-	canonical, err := filepath.EvalSymlinks(root)
-	if err != nil || hasTrashComponent(canonical) {
+	canonical, ok := permittedExistingAncestor(root, 0)
+	if !ok || hasTrashComponent(canonical) || canonical != resolvedRoot {
 		return "", false
 	}
 	return canonical, true
 }
 
+func permittedExistingAncestor(path string, links int) (string, bool) {
+	if links > 40 || !filepath.IsAbs(path) || hasTrashComponent(path) {
+		return "", false
+	}
+	path = filepath.Clean(path)
+	volume, rest := filepath.VolumeName(path), strings.TrimPrefix(path, filepath.VolumeName(path))
+	current := volume + string(filepath.Separator)
+	parts := strings.FieldsFunc(rest, func(r rune) bool { return r == filepath.Separator })
+	for index, part := range parts {
+		candidate := filepath.Join(current, part)
+		if hasTrashComponent(candidate) {
+			return "", false
+		}
+		info, err := os.Lstat(candidate)
+		if errors.Is(err, os.ErrNotExist) {
+			return "", false
+		}
+		if err != nil {
+			return "", false
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := os.Readlink(candidate)
+			if err != nil {
+				return "", false
+			}
+			if !filepath.IsAbs(target) {
+				target = filepath.Join(filepath.Dir(candidate), target)
+			}
+			if hasTrashComponent(target) {
+				return "", false
+			}
+			return permittedExistingAncestor(filepath.Join(target, filepath.Join(parts[index+1:]...)), links+1)
+		}
+		current = candidate
+	}
+	return current, true
+}
+
 func hasTrashComponent(path string) bool {
 	for _, component := range strings.FieldsFunc(filepath.Clean(path), func(r rune) bool { return r == filepath.Separator }) {
-		component = strings.TrimPrefix(component, ".")
-		if strings.EqualFold(component, "trash") || strings.EqualFold(component, "trashes") {
+		if strings.EqualFold(component, ".trash") || strings.EqualFold(component, ".trashes") {
 			return true
 		}
 	}

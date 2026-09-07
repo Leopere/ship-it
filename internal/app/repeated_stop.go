@@ -96,6 +96,9 @@ func continuationRoots(event hookEvent) []string {
 }
 
 func hasUnblockedExplicitWork(event hookEvent) bool {
+	if strings.TrimSpace(event.CWD) == "" && len(event.WorkspaceRoots) == 0 {
+		return false
+	}
 	for _, root := range hookRoots(event) {
 		if explicitRootNeedsDelivery(event, root) {
 			return true
@@ -122,6 +125,11 @@ func canonicalRetryRoot(root string) string {
 	if hasTrashComponent(root) {
 		return ""
 	}
+	var ok bool
+	root, ok = permittedExistingAncestor(root, 0)
+	if !ok {
+		return ""
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	if output, err := gitLocal(ctx, root, "rev-parse", "--show-toplevel"); err == nil {
@@ -130,7 +138,7 @@ func canonicalRetryRoot(root string) string {
 	if hasTrashComponent(root) {
 		return ""
 	}
-	if canonical, err := filepath.EvalSymlinks(root); err == nil {
+	if canonical, ok := permittedExistingAncestor(root, 0); ok {
 		return canonical
 	}
 	return filepath.Clean(root)

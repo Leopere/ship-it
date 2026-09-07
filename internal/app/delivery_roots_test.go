@@ -18,7 +18,11 @@ func TestStopDeliversTouchedExternalRepositoryOnce(t *testing.T) {
 	if err := os.Symlink(external, alias); err != nil {
 		t.Fatal(err)
 	}
-	writeTouchedRegistry(t, "session", map[string]uint64{alias: 1})
+	canonical, err := filepath.EvalSymlinks(external)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeTouchedRegistry(t, "session", map[string]uint64{canonical: 1})
 	installTallyStub(t)
 
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(alias) + `}`
@@ -60,7 +64,7 @@ func TestTouchedDeliveryKeepsFailedAndNewerGenerations(t *testing.T) {
 	runGit(t, failed, "init", "-q")
 	configure(t, failed)
 	write(t, filepath.Join(failed, "pending.txt"), "pending\n")
-	writeTouchedRegistry(t, "session", map[string]uint64{failed: 1})
+	writeTouchedRegistry(t, "session", map[string]uint64{canonicalFailed: 1})
 	installTallyStub(t)
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(testDir(t)) + `}`
 	var output, diagnostics bytes.Buffer
@@ -70,7 +74,7 @@ func TestTouchedDeliveryKeepsFailedAndNewerGenerations(t *testing.T) {
 		t.Fatalf("failed delivery was cleared: registry=%#v err=%v", registry, err)
 	}
 
-	writeTouchedRegistry(t, "session", map[string]uint64{failed: 2})
+	writeTouchedRegistry(t, "session", map[string]uint64{canonicalFailed: 2})
 	if err := clearDeliveredTouchedRoots("session", map[string]uint64{canonicalFailed: 1}); err != nil {
 		t.Fatal(err)
 	}
@@ -86,6 +90,23 @@ func TestHookRootsRejectTrashComponentsBeforeRepositoryLookup(t *testing.T) {
 	}
 	if roots := hookRoots(hookEvent{WorkspaceRoots: []string{"/tmp/.Trash/project"}}); len(roots) != 0 {
 		t.Fatalf("Trash workspace selected roots: %#v", roots)
+	}
+}
+
+func TestTouchedRootRejectsForbiddenAliasAndMissingNestedRoot(t *testing.T) {
+	repo := testDir(t)
+	runGit(t, repo, "init", "-q")
+	alias := filepath.Join(testDir(t), "safe-alias")
+	// The target is absent. Reject its hidden component from the link text
+	// without traversing that target or invoking Git for it.
+	if err := os.Symlink(filepath.Join(testDir(t), ".Trash", "missing"), alias); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := canonicalTouchedRoot(alias); ok {
+		t.Fatal("forbidden alias was accepted")
+	}
+	if _, ok := canonicalTouchedRoot(filepath.Join(repo, "removed", "nested")); ok {
+		t.Fatal("missing nested path resolved to its Git parent")
 	}
 }
 
@@ -193,6 +214,16 @@ func TestCleanFailedDeploymentRemainsPendingForNextTurn(t *testing.T) {
 	active.TurnID = "next"
 	if _, run := lifecycleMode(active); !run {
 		t.Fatal("clean failed deployment was not eligible in the next turn")
+	}
+	if err := finalizeTouchedRoots("session", "next", map[string]uint64{canonical: 1}, nil); err != nil {
+		t.Fatal(err)
+	}
+	registryPath, err := deliveryRootRegistryPath("session")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(registryPath); !os.IsNotExist(err) {
+		t.Fatalf("successful recovery did not clear registry: %v", err)
 	}
 }
 
