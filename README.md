@@ -4,6 +4,8 @@
 
 Before the first delivery each local day, it runs `git pull --autostash`. Every bare invocation then runs `git add .`, creates an automatic commit when changes are staged, and runs `git push` in the same call. Scripts and agents do not select a lifecycle phase.
 
+Shipping stages all changes without content selection or approval prompts. Neither shipping nor deployment requires a clean worktree. Deployment runs from a private snapshot of the exact pushed commit, so local worktree and index changes do not block it or enter the snapshot.
+
 Native Codex and Cursor lifecycle hooks invoke the same binary. Session start ensures the daily pull has happened. Stop ships the completed coding cycle. After a successful push, a tracked `.deploy-it.json` triggers `deploy-it` for the repository’s declared destination. Repositories without a deployment contract still ship normally. Git delivery requires no verification contract, tags, branch switches, wrapper scripts, or GitHub Actions policy.
 
 Run `ship-it install` once to install the binary, skill, and lifecycle hooks. Routine use requires no arguments or agent involvement.
