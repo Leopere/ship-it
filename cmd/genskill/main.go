@@ -15,8 +15,8 @@ const marker = "SHIP_IT_SKILL"
 
 const openAIYAML = `interface:
   display_name: "Ship It"
-  short_description: "Finalize every repository cycle and deploy"
-  default_prompt: "Use the ship-it SessionStart and Stop hooks: initialize once at the beginning of the local workday, then ship verified repository changes at the actual end of work."
+  short_description: "Pull daily and ship every coding cycle"
+  default_prompt: "Let the native lifecycle hooks run the no-argument ship-it binary. Do not run routine Git commands yourself."
 `
 
 func main() {

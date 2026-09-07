@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/Leopere/ship-it/internal/cursorhook"
 	"github.com/Leopere/ship-it/internal/skilldoc"
@@ -38,9 +37,6 @@ func Local(copyBinary bool, out io.Writer) error {
 		filepath.Join(home, ".claude", "skills"),
 		filepath.Join(home, ".cursor", "skills"),
 	} {
-		if err := retireEnsureShip(base, home); err != nil {
-			return err
-		}
 		dir := filepath.Join(base, "ship-it")
 		if err := os.MkdirAll(filepath.Join(dir, "agents"), 0o755); err != nil {
 			return err
@@ -51,7 +47,12 @@ func Local(copyBinary bool, out io.Writer) error {
 		if err := writeAtomic(filepath.Join(dir, "agents", "openai.yaml"), []byte(skilldoc.OpenAIYAML), 0o644); err != nil {
 			return err
 		}
-		deconflictRepeatable(filepath.Join(base, "repeatable-dev-ship", "SKILL.md"))
+	}
+	if err := installCodexHooks(home, out); err != nil {
+		return err
+	}
+	if err := updateDeliveryGuidance(home); err != nil {
+		return err
 	}
 	if err := cursorhook.Install(home, out); err != nil {
 		return err
@@ -85,39 +86,6 @@ func Remote(host string, out io.Writer) error {
 	}
 	fmt.Fprintf(out, "Installed ship-it on %s.\n", host)
 	return nil
-}
-
-func retireEnsureShip(base, home string) error {
-	path := filepath.Join(base, "ensure-ship")
-	info, err := os.Lstat(path)
-	if os.IsNotExist(err) {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-	if info.Mode()&os.ModeSymlink != 0 {
-		return os.Remove(path)
-	}
-	agent := strings.TrimPrefix(filepath.Base(filepath.Dir(base)), ".")
-	backup := filepath.Join(home, ".local", "share", "ship-it", "retired-skills", agent+"-ensure-ship-"+time.Now().UTC().Format("20060102T150405Z"))
-	if err := os.MkdirAll(filepath.Dir(backup), 0o755); err != nil {
-		return err
-	}
-	return os.Rename(path, backup)
-}
-
-func deconflictRepeatable(path string) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return
-	}
-	updated := strings.ReplaceAll(string(data), "For a request that only needs an ordinary ship.sh, use ensure-ship instead.", "For final Git shipping, defer to the ship-it skill and binary.")
-	updated = strings.ReplaceAll(updated, "- Run `verify` before `git add`.", "- Delegate final stage, commit, merge, tag, and push to `ship-it`; do not add verification gates to `ship.sh`.")
-	updated = strings.ReplaceAll(updated, "- Stage, commit, and push in a small obvious script.", "- Keep build and deployment commands separate from `ship.sh`.")
-	if updated != string(data) {
-		_ = writeAtomic(path, []byte(updated), 0o644)
-	}
 }
 
 func copyAtomic(src, dest string, mode os.FileMode) error {

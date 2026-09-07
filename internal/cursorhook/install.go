@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const hookCommand = "$HOME/.local/bin/ship-it cursor-hook"
+const hookCommand = "$HOME/.local/bin/ship-it"
 
 func Install(home string, out io.Writer) error {
 	path := filepath.Join(home, ".cursor", "hooks.json")
@@ -24,11 +24,11 @@ func Install(home string, out io.Writer) error {
 		file.Hooks = map[string][]map[string]any{}
 	}
 	file.Hooks["sessionStart"] = ensureHook(file.Hooks["sessionStart"], map[string]any{"command": hookCommand})
-	file.Hooks["stop"] = ensureHook(file.Hooks["stop"], map[string]any{"command": hookCommand, "loop_limit": 2})
+	file.Hooks["stop"] = ensureHook(file.Hooks["stop"], map[string]any{"command": hookCommand})
 	if err := writeHooks(path, file); err != nil {
 		return err
 	}
-	fmt.Fprintln(out, "Installed Cursor wrap hooks in", path)
+	fmt.Fprintln(out, "Installed native Cursor lifecycle hooks in", path)
 	return nil
 }
 
@@ -82,9 +82,10 @@ func writeHooks(path string, file hooksFile) error {
 }
 
 func ensureHook(existing []map[string]any, hook map[string]any) []map[string]any {
-	for _, item := range existing {
+	for i, item := range existing {
 		command, _ := item["command"].(string)
-		if strings.Contains(command, "ship-it cursor-hook") {
+		if strings.Contains(command, "ship-it") {
+			existing[i] = hook
 			return existing
 		}
 	}

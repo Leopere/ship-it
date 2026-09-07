@@ -8,392 +8,280 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
-	"strconv"
 	"strings"
-	"time"
 )
 
-const Wrapper = `#!/bin/sh
-set -eu
-exec "${SHIP_IT_BIN:-$HOME/.local/bin/ship-it}" "$@"
-`
+var (
+	executablePath = os.Executable
+	remoteNameRE   = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`)
+)
 
 type Repo struct {
-	Root   string
-	Remote string
-	Out    io.Writer
-	Err    io.Writer
+	Root               string
+	Out                io.Writer
+	Err                io.Writer
+	DeliveryCommit     string
+	DeploymentRequired bool
 }
 
-func Open(cwd, remote string, out, errOut io.Writer) (*Repo, error) {
-	root, err := outputAt(cwd, "rev-parse", "--show-toplevel")
-	if err != nil {
+func Open(cwd string, out, errOut io.Writer) (*Repo, error) {
+	cmd := exec.Command("git", "-C", cwd, "rev-parse", "--show-toplevel")
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = errOut
+	if err := cmd.Run(); err != nil {
 		return nil, errors.New("not inside a Git repository")
 	}
-	if remote == "" {
-		remote = "origin"
-	}
-	r := &Repo{Root: strings.TrimSpace(root), Remote: remote, Out: out, Err: errOut}
-	if _, err := r.output("remote", "get-url", remote); err != nil {
-		return nil, fmt.Errorf("remote %q is not configured", remote)
-	}
-	return r, nil
+	return &Repo{Root: strings.TrimSpace(stdout.String()), Out: out, Err: errOut}, nil
 }
 
-func (r *Repo) DefaultBranch(explicit string) (string, error) {
-	if explicit != "" {
-		return explicit, nil
-	}
-	out, err := r.output("ls-remote", "--symref", r.Remote, "HEAD")
-	if err == nil {
-		for _, line := range strings.Split(out, "\n") {
-			if strings.HasPrefix(line, "ref: refs/heads/") && strings.HasSuffix(line, "\tHEAD") {
-				return strings.TrimSuffix(strings.TrimPrefix(line, "ref: refs/heads/"), "\tHEAD"), nil
-			}
-		}
-	}
-	if out, localErr := r.output("symbolic-ref", "--short", "refs/remotes/"+r.Remote+"/HEAD"); localErr == nil {
-		return strings.TrimPrefix(strings.TrimSpace(out), r.Remote+"/"), nil
-	}
-	for _, candidate := range []string{"main", "master"} {
-		if out, candidateErr := r.output("ls-remote", "--heads", r.Remote, candidate); candidateErr == nil && strings.TrimSpace(out) != "" {
-			return candidate, nil
-		}
-	}
-	return "", fmt.Errorf("cannot determine %s's default branch", r.Remote)
+func (r *Repo) Pull() error {
+	return r.run("pull", "--autostash")
 }
 
-func (r *Repo) EnsureWrapper() (string, error) {
-	path := filepath.Join(r.Root, "ship.sh")
-	current, err := os.ReadFile(path)
-	if err == nil && string(current) == Wrapper {
-		if chmodErr := os.Chmod(path, 0o755); chmodErr != nil {
-			return "", chmodErr
-		}
-		return "", nil
-	}
-	var backup string
-	if err == nil {
-		for n := 0; ; n++ {
-			name := "ship.project.sh"
-			if n > 0 {
-				name = fmt.Sprintf("ship.project.%d.sh", n+1)
-			}
-			candidate := filepath.Join(r.Root, name)
-			if _, statErr := os.Lstat(candidate); os.IsNotExist(statErr) {
-				if renameErr := os.Rename(path, candidate); renameErr != nil {
-					return "", renameErr
-				}
-				backup = name
-				break
-			}
-		}
-	} else if !os.IsNotExist(err) {
-		return "", err
-	}
-	if err := os.WriteFile(path, []byte(Wrapper), 0o755); err != nil {
-		return "", err
-	}
-	if backup != "" {
-		fmt.Fprintf(r.Out, "Preserved the old ship.sh as %s\n", backup)
-	}
-	return backup, nil
-}
-
-func (r *Repo) ValidateNoGitHubHostedRunners() error {
-	out, err := r.output("ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", ".github/workflows")
-	if err != nil {
-		return fmt.Errorf("inspect GitHub Actions workflows: %w", err)
-	}
-	workflowData := make(map[string][]byte)
-	localWorkflows := make(map[string]struct{})
-	for _, path := range strings.Split(out, "\x00") {
-		if path == "" || (filepath.Ext(path) != ".yml" && filepath.Ext(path) != ".yaml") {
-			continue
-		}
-		data, readErr := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(path)))
-		if os.IsNotExist(readErr) {
-			continue
-		}
-		if readErr != nil {
-			return fmt.Errorf("inspect GitHub Actions workflow %s: %w", path, readErr)
-		}
-		workflowData[path] = data
-		localWorkflows[path] = struct{}{}
-	}
-	var violations []string
-	for path, data := range workflowData {
-		findings, validateErr := hostedRunnerFindings(data, localWorkflows)
-		if validateErr != nil {
-			return fmt.Errorf("validate GitHub Actions workflow %s: %w", path, validateErr)
-		}
-		for _, finding := range findings {
-			violations = append(violations, fmt.Sprintf("%s:%d: job %s selects %s", path, finding.Line, finding.Job, finding.Selection))
-		}
-	}
-	if len(violations) == 0 {
-		return nil
-	}
-	sort.Strings(violations)
-	return fmt.Errorf(
-		"shipping blocked: every GitHub Actions job must use a documented self-hosted local runner label profile or an existing local reusable workflow: %s",
-		strings.Join(violations, ", "),
-	)
-}
-
-func (r *Repo) Start(branch string) error {
-	if err := r.finishMerge(); err != nil {
+func (r *Repo) Ship() error {
+	if err := r.run("add", "."); err != nil {
 		return err
-	}
-	if err := r.fetch(branch); err != nil {
-		return err
-	}
-	ref := r.Remote + "/" + branch
-	if r.isAncestor(ref, "HEAD") {
-		fmt.Fprintf(r.Out, "Already current with %s/%s.\n", r.Remote, branch)
-		return nil
-	}
-	if err := r.run("merge", "--autostash", "--no-edit", "--no-verify", "--no-gpg-sign", ref); err != nil {
-		return conflictError(err)
-	}
-	fmt.Fprintf(r.Out, "Merged %s/%s into the current branch.\n", r.Remote, branch)
-	return nil
-}
-
-type ShipOptions struct {
-	Branch  string
-	Message string
-	NoTag   bool
-	Now     time.Time
-}
-
-type Result struct {
-	Branch string
-	Commit string
-	Tag    string
-	Noop   bool
-}
-
-func (r *Repo) Ship(opts ShipOptions) (Result, error) {
-	if err := r.ValidateNoGitHubHostedRunners(); err != nil {
-		return Result{}, err
-	}
-	if err := r.finishMerge(); err != nil {
-		return Result{}, err
-	}
-	if err := r.fetch(opts.Branch); err != nil {
-		return Result{}, err
-	}
-	current, err := r.currentBranch()
-	if err != nil {
-		return Result{}, err
-	}
-	if err := r.run("add", "-A"); err != nil {
-		return Result{}, err
 	}
 	changed, err := r.hasStagedChanges()
 	if err != nil {
-		return Result{}, err
+		return err
 	}
 	if changed {
-		message := opts.Message
-		if message == "" {
-			message, err = r.autoMessage()
-			if err != nil {
-				return Result{}, err
-			}
+		message, err := r.autoMessage()
+		if err != nil {
+			return err
 		}
 		if err := r.run("commit", "--no-verify", "--no-gpg-sign", "-m", message); err != nil {
-			return Result{}, err
+			return err
 		}
 	}
-	source, err := r.output("rev-parse", "HEAD")
+	pushedCommit, err := r.output("rev-parse", "--verify", "HEAD^{commit}")
 	if err != nil {
-		return Result{}, errors.New("repository has no commit to ship")
+		return errors.New("repository has no commit to ship")
 	}
-	source = strings.TrimSpace(source)
-
-	if current != opts.Branch {
-		if r.localBranchExists(opts.Branch) {
-			if err := r.run("switch", opts.Branch); err != nil {
-				return Result{}, err
-			}
-		} else if err := r.run("switch", "--create", opts.Branch, "--track", r.Remote+"/"+opts.Branch); err != nil {
-			return Result{}, err
-		}
-		if !r.isAncestor(source, "HEAD") {
-			if err := r.merge(source); err != nil {
-				return Result{}, conflictError(err)
-			}
-		}
+	pushedCommit = strings.TrimSpace(pushedCommit)
+	r.DeliveryCommit = pushedCommit
+	r.DeploymentRequired = false
+	// Resolve this before pushing, so the deployment proves the exact
+	// destination selected by the same bare git push. A missing contract still
+	// permits the normal push; deployment reports an unsafe destination only
+	// after the successful push establishes the handoff boundary.
+	destination, destinationErr := r.pushDestination()
+	if err := r.run("push", "--no-verify"); err != nil {
+		return fmt.Errorf("Git push failed: %w", err)
 	}
-
-	if err := r.mergeRemote(opts.Branch); err != nil {
-		return Result{}, err
-	}
-	remoteRef := r.Remote + "/" + opts.Branch
-	head, err := r.output("rev-parse", "HEAD")
+	// Only a tracked deployment contract opts this repository into deployment.
+	cmd := exec.Command("git", "-C", r.Root, "ls-tree", "--name-only", pushedCommit, "--", ".deploy-it.json")
+	contract, err := cmd.Output()
 	if err != nil {
-		return Result{}, err
+		return fmt.Errorf("Git push succeeded; read deployment contract: %w", err)
 	}
-	head = strings.TrimSpace(head)
-	remoteHead, _ := r.output("rev-parse", remoteRef)
-	if head == strings.TrimSpace(remoteHead) {
-		if err := r.ValidateNoGitHubHostedRunners(); err != nil {
-			return Result{}, err
-		}
-		fmt.Fprintln(r.Out, "Already shipped.")
-		return Result{Branch: opts.Branch, Commit: head, Noop: true}, nil
-	}
-
-	now := opts.Now
-	if now.IsZero() {
-		now = time.Now().UTC()
-	}
-	var tag string
-	for attempt := 1; attempt <= 3; attempt++ {
-		if err := r.ValidateNoGitHubHostedRunners(); err != nil {
-			return Result{}, err
-		}
-		if !opts.NoTag {
-			tag, err = r.nextTag(now)
-			if err != nil {
-				return Result{}, err
-			}
-			if err := r.run("tag", tag); err != nil {
-				return Result{}, err
-			}
-		}
-		args := []string{"push", "--no-verify", "--atomic", r.Remote, "HEAD:refs/heads/" + opts.Branch}
-		if tag != "" {
-			args = append(args, "refs/tags/"+tag+":refs/tags/"+tag)
-		}
-		if err := r.run(args...); err == nil {
-			fmt.Fprintf(r.Out, "Shipped %s", opts.Branch)
-			if tag != "" {
-				fmt.Fprintf(r.Out, " as %s", tag)
-			}
-			fmt.Fprintln(r.Out, ".")
-			return Result{Branch: opts.Branch, Commit: head, Tag: tag}, nil
-		} else if attempt == 3 {
-			return Result{}, fmt.Errorf("push failed after %d attempts: %w", attempt, err)
-		}
-		if tag != "" {
-			_ = r.runQuiet("tag", "-d", tag)
-			tag = ""
-		}
-		if err := r.fetch(opts.Branch); err != nil {
-			return Result{}, err
-		}
-		if err := r.mergeRemote(opts.Branch); err != nil {
-			return Result{}, err
-		}
-		head, _ = r.output("rev-parse", "HEAD")
-		head = strings.TrimSpace(head)
-	}
-	panic("unreachable")
-}
-
-func (r *Repo) fetch(branch string) error {
-	return r.run("fetch", "--prune", "--tags", r.Remote, "+refs/heads/"+branch+":refs/remotes/"+r.Remote+"/"+branch)
-}
-
-func (r *Repo) mergeRemote(branch string) error {
-	ref := r.Remote + "/" + branch
-	if r.isAncestor(ref, "HEAD") {
+	if strings.TrimSpace(string(contract)) == "" {
 		return nil
 	}
-	if err := r.merge(ref); err != nil {
-		return conflictError(err)
+	r.DeploymentRequired = true
+	if destinationErr != nil {
+		return fmt.Errorf("Git push succeeded; resolve deployment destination: %w", destinationErr)
+	}
+	deployIt, err := deployItPath()
+	if err != nil {
+		return fmt.Errorf("Git push succeeded; find deploy-it: %w", err)
+	}
+	cmd = exec.Command(deployIt, "--commit", pushedCommit, "--branch", destination.Branch, "--remote", destination.Remote)
+	cmd.Dir = r.Root
+	cmd.Stdout, cmd.Stderr = r.Out, r.Err
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("Git push succeeded; deployment failed: %w", err)
 	}
 	return nil
 }
 
-func (r *Repo) merge(ref string) error {
-	return r.run("merge", "--no-edit", "--no-verify", "--no-gpg-sign", ref)
+type pushDestination struct {
+	Remote string
+	Branch string
 }
 
-func (r *Repo) finishMerge() error {
-	mergeHead := filepath.Join(r.Root, ".git", "MERGE_HEAD")
-	gitPath, err := r.output("rev-parse", "--git-path", "MERGE_HEAD")
-	if err == nil {
-		mergeHead = strings.TrimSpace(gitPath)
-		if !filepath.IsAbs(mergeHead) {
-			mergeHead = filepath.Join(r.Root, mergeHead)
-		}
+// pushDestination mirrors the single-branch destinations Git can infer for a
+// bare "git push". Deployments require one branch that proves the immutable
+// commit, so fan-out and non-branch refspecs deliberately fail.
+func (r *Repo) pushDestination() (pushDestination, error) {
+	branch, err := r.output("symbolic-ref", "--quiet", "--short", "HEAD")
+	if err != nil || strings.TrimSpace(branch) == "" {
+		return pushDestination{}, errors.New("deployment requires HEAD checked out on a branch")
 	}
-	if _, err := os.Stat(mergeHead); os.IsNotExist(err) {
-		return nil
-	}
-	if err := r.run("add", "-A"); err != nil {
-		return err
-	}
-	unmerged, err := r.output("diff", "--name-only", "--diff-filter=U")
-	if err != nil {
-		return err
-	}
-	if strings.TrimSpace(unmerged) != "" {
-		return errors.New("merge conflicts remain; resolve every conflicted file and rerun ship-it")
-	}
-	if err := r.run("commit", "--no-edit", "--no-verify", "--no-gpg-sign"); err != nil {
-		return err
-	}
-	return nil
-}
+	branch = strings.TrimSpace(branch)
 
-func (r *Repo) nextTag(now time.Time) (string, error) {
-	prefix := "v" + now.UTC().Format("2006.01.02") + "."
-	out, err := r.output("tag", "--list", prefix+"*")
+	output, err := r.output("for-each-ref", "--format=%(push:remotename)%00%(push:remoteref)%00%(upstream:remotename)%00%(upstream:remoteref)", "refs/heads/"+branch)
 	if err != nil {
-		return "", err
+		return pushDestination{}, err
 	}
-	max := 0
-	for _, line := range strings.Fields(out) {
-		n, convErr := strconv.Atoi(strings.TrimPrefix(line, prefix))
-		if convErr == nil && n > max {
-			max = n
-		}
+	parts := strings.Split(strings.TrimSuffix(output, "\n"), "\x00")
+	if len(parts) != 4 || !remoteNameRE.MatchString(parts[0]) {
+		return pushDestination{}, errors.New("deployment requires a configured branch push destination")
 	}
-	return prefix + strconv.Itoa(max+1), nil
-}
 
-func (r *Repo) autoMessage() (string, error) {
-	out, err := r.output("diff", "--cached", "--name-only")
+	pushSpecs, err := r.configValues("remote." + parts[0] + ".push")
 	if err != nil {
-		return "", err
+		return pushDestination{}, err
 	}
-	var paths []string
-	for _, path := range strings.Split(strings.TrimSpace(out), "\n") {
-		if path != "" {
-			paths = append(paths, path)
-		}
-	}
-	sort.Strings(paths)
-	if len(paths) == 1 {
-		return "Update " + paths[0], nil
-	}
-	if len(paths) > 1 {
-		root := strings.Split(paths[0], "/")[0]
-		same := strings.Contains(paths[0], "/")
-		for _, path := range paths[1:] {
-			if !strings.HasPrefix(path, root+"/") {
-				same = false
+	explicitRef := ""
+	if len(pushSpecs) > 0 {
+		matching := 0
+		for _, spec := range pushSpecs {
+			matches, supported := refspecMatchesBranch(spec, branch)
+			if !supported {
+				return pushDestination{}, fmt.Errorf("deployment does not support configured push refspec %q", spec)
+			}
+			if matches {
+				matching++
+				var supported bool
+				explicitRef, supported = refspecDestination(spec, branch)
+				if !supported {
+					return pushDestination{}, fmt.Errorf("deployment does not support configured push refspec %q", spec)
+				}
 			}
 		}
-		if same {
-			return "Update " + root, nil
+		if matching != 1 {
+			return pushDestination{}, errors.New("deployment requires exactly one configured branch push destination")
 		}
 	}
-	return fmt.Sprintf("Update %d files", len(paths)), nil
+
+	remoteRef := parts[1]
+	if explicitRef != "" {
+		remoteRef = explicitRef
+	}
+	if remoteRef == "" {
+		remoteRef, err = r.defaultPushRef(branch, parts[0], parts[2], parts[3])
+		if err != nil {
+			return pushDestination{}, err
+		}
+	}
+	if !strings.HasPrefix(remoteRef, "refs/heads/") {
+		return pushDestination{}, errors.New("deployment requires the pushed destination to be a branch")
+	}
+	destination := strings.TrimPrefix(remoteRef, "refs/heads/")
+	if _, err := r.output("check-ref-format", "--branch", destination); err != nil {
+		return pushDestination{}, errors.New("deployment requires a valid pushed branch destination")
+	}
+	return pushDestination{Remote: parts[0], Branch: destination}, nil
 }
 
-func (r *Repo) currentBranch() (string, error) {
-	out, err := r.output("symbolic-ref", "--quiet", "--short", "HEAD")
+func (r *Repo) defaultPushRef(branch, remote, upstreamRemote, upstreamRef string) (string, error) {
+	modes, err := r.configValues("push.default")
 	if err != nil {
-		return "", errors.New("detached HEAD is not supported; switch to a branch and rerun")
+		return "", err
 	}
-	return strings.TrimSpace(out), nil
+	mode := "simple"
+	if len(modes) > 0 {
+		mode = modes[len(modes)-1]
+	}
+	switch strings.TrimSpace(mode) {
+	case "", "simple":
+		// With a triangular workflow, simple pushes the current branch to the
+		// selected push remote. When it uses the upstream remote, Git requires
+		// the upstream branch to have the same name.
+		if remote != upstreamRemote {
+			return "refs/heads/" + branch, nil
+		}
+		if upstreamRef == "refs/heads/"+branch {
+			return upstreamRef, nil
+		}
+	case "upstream", "tracking":
+		if remote == upstreamRemote && strings.HasPrefix(upstreamRef, "refs/heads/") {
+			return upstreamRef, nil
+		}
+	case "current", "matching":
+		return "refs/heads/" + branch, nil
+	case "nothing":
+		return "", errors.New("deployment cannot infer a branch when push.default=nothing")
+	}
+	return "", errors.New("deployment requires a configured branch push destination")
+}
+
+func (r *Repo) configValues(name string) ([]string, error) {
+	cmd := exec.Command("git", "-C", r.Root, "config", "--get-all", name)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
+	if err := cmd.Run(); err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("git config --get-all %s: %s: %w", name, strings.TrimSpace(stderr.String()), err)
+	}
+	return strings.Fields(strings.TrimSpace(stdout.String())), nil
+}
+
+func refspecMatchesBranch(spec, branch string) (matches, supported bool) {
+	spec = strings.TrimPrefix(spec, "+")
+	if spec == "" || strings.HasPrefix(spec, "^") || strings.HasPrefix(spec, ":") {
+		return false, false
+	}
+	source := spec
+	if colon := strings.IndexByte(spec, ':'); colon >= 0 {
+		source = spec[:colon]
+	}
+	if source == "" {
+		return false, false
+	}
+	fullBranch := "refs/heads/" + branch
+	if source == branch || source == fullBranch {
+		return true, true
+	}
+	if strings.Count(source, "*") > 1 {
+		return false, false
+	}
+	if strings.Count(source, "*") == 1 {
+		parts := strings.Split(source, "*")
+		return strings.HasPrefix(fullBranch, parts[0]) && strings.HasSuffix(fullBranch, parts[1]), true
+	}
+	return false, true
+}
+
+// refspecDestination expands the ordinary shorthand accepted by git push
+// (for example main:production). Wildcard destinations are already resolved
+// by Git's push atom, so they intentionally leave that value in place.
+func refspecDestination(spec, branch string) (string, bool) {
+	spec = strings.TrimPrefix(spec, "+")
+	if spec == "" || strings.HasPrefix(spec, "^") || strings.HasPrefix(spec, ":") {
+		return "", false
+	}
+	source, destination := spec, ""
+	if colon := strings.IndexByte(spec, ':'); colon >= 0 {
+		source, destination = spec[:colon], spec[colon+1:]
+	} else {
+		destination = source
+	}
+	if source == "" || destination == "" {
+		return "", false
+	}
+	if strings.Contains(destination, "*") {
+		return "", true
+	}
+	if strings.HasPrefix(destination, "refs/") {
+		return destination, true
+	}
+	return "refs/heads/" + destination, true
+}
+
+func deployItPath() (string, error) {
+	if executable, err := executablePath(); err == nil {
+		if _, statErr := os.Stat(executable); statErr == nil {
+			candidate := filepath.Join(filepath.Dir(executable), "deploy-it")
+			if info, candidateErr := os.Stat(candidate); candidateErr == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 {
+				return candidate, nil
+			}
+		}
+	}
+	path, err := exec.LookPath("deploy-it")
+	if err != nil {
+		return "", err
+	}
+	return path, nil
 }
 
 func (r *Repo) hasStagedChanges() (bool, error) {
@@ -409,38 +297,28 @@ func (r *Repo) hasStagedChanges() (bool, error) {
 	return false, err
 }
 
-func (r *Repo) localBranchExists(branch string) bool {
-	return r.runQuiet("show-ref", "--verify", "--quiet", "refs/heads/"+branch) == nil
-}
-
-func (r *Repo) isAncestor(ancestor, descendant string) bool {
-	return r.runQuiet("merge-base", "--is-ancestor", ancestor, descendant) == nil
-}
-
-func (r *Repo) run(args ...string) error {
-	cmd := exec.Command("git", append([]string{"-C", r.Root}, args...)...)
-	cmd.Stdout = r.Out
-	cmd.Stderr = r.Err
-	cmd.Stdin = os.Stdin
-	cmd.Env = append(os.Environ(), "GIT_EDITOR=true", "GIT_MERGE_AUTOEDIT=no")
-	return cmd.Run()
-}
-
-func (r *Repo) runQuiet(args ...string) error {
-	cmd := exec.Command("git", append([]string{"-C", r.Root}, args...)...)
-	cmd.Env = append(os.Environ(), "GIT_EDITOR=true", "GIT_MERGE_AUTOEDIT=no")
-	return cmd.Run()
+func (r *Repo) autoMessage() (string, error) {
+	stdout, err := r.output("diff", "--cached", "--name-only")
+	if err != nil {
+		return "", err
+	}
+	var paths []string
+	for _, path := range strings.Split(strings.TrimSpace(stdout), "\n") {
+		if path != "" {
+			paths = append(paths, path)
+		}
+	}
+	sort.Strings(paths)
+	if len(paths) == 1 {
+		return "Update " + paths[0], nil
+	}
+	return fmt.Sprintf("Update %d files", len(paths)), nil
 }
 
 func (r *Repo) output(args ...string) (string, error) {
-	return outputAt(r.Root, args...)
-}
-
-func outputAt(cwd string, args ...string) (string, error) {
-	cmd := exec.Command("git", append([]string{"-C", cwd}, args...)...)
+	cmd := exec.Command("git", append([]string{"-C", r.Root}, args...)...)
 	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	if err := cmd.Run(); err != nil {
 		return stdout.String(), fmt.Errorf("git %s: %s: %w", strings.Join(args, " "), strings.TrimSpace(stderr.String()), err)
@@ -448,6 +326,11 @@ func outputAt(cwd string, args ...string) (string, error) {
 	return stdout.String(), nil
 }
 
-func conflictError(err error) error {
-	return fmt.Errorf("merge stopped; resolve every conflicted file according to the requested work, then rerun ship-it: %w", err)
+func (r *Repo) run(args ...string) error {
+	cmd := exec.Command("git", append([]string{"-C", r.Root}, args...)...)
+	cmd.Stdout = r.Out
+	cmd.Stderr = r.Err
+	cmd.Stdin = nil
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
+	return cmd.Run()
 }
