@@ -18,7 +18,9 @@ Agents implement and review the requested work, then finish. Do not invoke ship-
 
 After a successful push, ship-it invokes `deploy-it` when the pushed revision contains `.deploy-it.json`. The repository command owns the destination and live acceptance check. Repositories without this file still ship normally. If production delivery is requested, finish the repository deployment command before ending the turn. Use existing project configuration and the authorized destination to prepare that command.
 
-Keep the Git flow small. Do not add verification gates, tags, branch switching, wrapper scripts, pull requests, or workflow policies to ship-it. The commit history is the delivery record. A push proves Git delivery; a successful destination check proves deployment.
+Keep Git delivery mechanical: pull once per local day, then `git add .`, an automatic commit when needed, and push everything Git stages. Do not assess content, select files, or add test, review, or conflict-assessment gates to this flow. Do not add tags, branch switching, wrapper scripts, pull requests, or workflow policies to ship-it. The working agent owns diagnosis and repairs. The commit history is the delivery record. A push proves Git delivery; a successful destination check proves deployment.
+
+Tests provide advisory evidence, not an automatic deployment veto. Analyze whether a failure reflects an intentional behavior change, an unintended defect, a faulty test, or an environment problem. Repair the relevant cause and continue. Keep failed results accurate and verify the actual deployed behavior independently.
 
 A failed attempt is a diagnosis step. Fix recoverable code, configuration, build, and command failures within the authorized scope. After diagnosis, rerun the affected deployment when its effects are understood. Do not invent a blocker from missing evidence, stale instructions, or a previous failed attempt. If progress requires external input, identify the attempted command, observed failure, and exact missing access or information. Preserve real permission boundaries and do not claim deployment before observing its result.
 */
