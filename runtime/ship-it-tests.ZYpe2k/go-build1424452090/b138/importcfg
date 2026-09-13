@@ -1,0 +1,6 @@
+# import config
+packagefile encoding/asn1=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b117/_pkg_.a
+packagefile encoding/hex=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b083/_pkg_.a
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile math/big=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b080/_pkg_.a
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d

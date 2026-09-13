@@ -1,0 +1,10 @@
+# import config
+packagefile crypto/cipher=/Users/aedev/Library/Caches/go-build/38/3872418ef585371e263b5aac695b5807e3c5f0dee1937cf746bacc399ad0fa3c-d
+packagefile crypto/internal/alias=/Users/aedev/Library/Caches/go-build/46/4655efdf887baa238b8a7a59cd6c5c20bbeb2e564d942e13db7f2f66cec9dd15-d
+packagefile crypto/internal/boring=/Users/aedev/Library/Caches/go-build/d3/d3078d8cc963a511801ef5264a3e575b9da652e393476137a7fe908d592dba46-d
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile internal/byteorder=/Users/aedev/Library/Caches/go-build/4f/4f50afa11349d89988ce69f8aee1c18a4795f592c4139f0858b33bd6f1b76db6-d
+packagefile internal/cpu=/Users/aedev/Library/Caches/go-build/db/db7502e53ab28877dabede39da5235bbea9f9bb9abf5761fafb573e0340a46e7-d
+packagefile internal/goarch=/Users/aedev/Library/Caches/go-build/25/25d714abe375811fd57aefc2aca28101381065cf927d41baef0f398ef1347f21-d
+packagefile strconv=/Users/aedev/Library/Caches/go-build/ee/ee9c10aa579918d79c443cdbad4434ede6071db5e24de288b2f90301d88a7c64-d

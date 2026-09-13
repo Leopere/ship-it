@@ -1,0 +1,10 @@
+# import config
+importmap golang.org/x/net/idna=vendor/golang.org/x/net/idna
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile vendor/golang.org/x/net/idna=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b152/_pkg_.a
+packagefile net=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b140/_pkg_.a
+packagefile net/url=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b150/_pkg_.a
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

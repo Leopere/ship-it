@@ -1,0 +1,9 @@
+# import config
+importmap golang.org/x/sys/cpu=vendor/golang.org/x/sys/cpu
+packagefile crypto=/Users/aedev/Library/Caches/go-build/68/68a79e5ca98e549b65e463f17a2be8ba28b6209cbfc8c50f3d27ca0bf6283924-d
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile encoding/binary=/Users/aedev/Library/Caches/go-build/a5/a56c3a6725e7ef5db65b0805400a117bf60618fdd27c08ae9fe5c91c6601a2d1-d
+packagefile vendor/golang.org/x/sys/cpu=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b130/_pkg_.a
+packagefile hash=/Users/aedev/Library/Caches/go-build/1d/1d0528ba6cd47d76fbdd5c22d2fecf0ec13f0197fff1613735a3d003969bc86b-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d

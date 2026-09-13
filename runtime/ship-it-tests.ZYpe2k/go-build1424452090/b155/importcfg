@@ -1,0 +1,7 @@
+# import config
+packagefile bytes=/Users/aedev/Library/Caches/go-build/2a/2ae6cf00f129e81dc45f5b965fdeff8c15f47bfaa9a43b624f8fc834072ba15c-d
+packagefile container/list=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b102/_pkg_.a
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile log=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b156/_pkg_.a
+packagefile sort=/Users/aedev/Library/Caches/go-build/c8/c84344ba3d829fecd4c2ca841d408065796c69b3ecd484054efcba588bf85370-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

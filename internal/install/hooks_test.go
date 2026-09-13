@@ -43,7 +43,7 @@ func TestCodexHooksPreserveOtherHandlersAndInstallIdempotently(t *testing.T) {
 	if len(hooks["PreToolUse"].([]any)) != 1 || len(hooks["Stop"].([]any)) != 2 {
 		t.Fatal("unrelated hooks were lost or owned hooks duplicated")
 	}
-	for event, want := range map[string]float64{"SessionStart": 300, "Stop": 600} {
+	for event, want := range map[string]float64{"SessionStart": 300, "Stop": 2100} {
 		groups := hooks[event].([]any)
 		group := groups[len(groups)-1].(map[string]any)
 		handler := group["hooks"].([]any)[0].(map[string]any)

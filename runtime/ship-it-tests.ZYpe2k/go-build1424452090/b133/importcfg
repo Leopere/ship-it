@@ -1,0 +1,14 @@
+# import config
+packagefile bytes=/Users/aedev/Library/Caches/go-build/2a/2ae6cf00f129e81dc45f5b965fdeff8c15f47bfaa9a43b624f8fc834072ba15c-d
+packagefile crypto=/Users/aedev/Library/Caches/go-build/68/68a79e5ca98e549b65e463f17a2be8ba28b6209cbfc8c50f3d27ca0bf6283924-d
+packagefile crypto/internal/bigmod=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b113/_pkg_.a
+packagefile crypto/internal/boring=/Users/aedev/Library/Caches/go-build/d3/d3078d8cc963a511801ef5264a3e575b9da652e393476137a7fe908d592dba46-d
+packagefile crypto/internal/boring/bbig=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b114/_pkg_.a
+packagefile crypto/internal/randutil=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b079/_pkg_.a
+packagefile crypto/rand=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b071/_pkg_.a
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile hash=/Users/aedev/Library/Caches/go-build/1d/1d0528ba6cd47d76fbdd5c22d2fecf0ec13f0197fff1613735a3d003969bc86b-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile math=/Users/aedev/Library/Caches/go-build/2e/2eb5c084c7bfdf309e490fe8f181b029da653d189f61c9d6e446ca10c3fe4884-d
+packagefile math/big=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b080/_pkg_.a

@@ -1,0 +1,15 @@
+# import config
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile path/filepath=/Users/aedev/Library/Caches/go-build/9f/9fdf9a456783cf8c30a48167b2634f6b76243b2ac020565160eeb38e84629268-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile testing=/Users/aedev/Library/Caches/go-build/c7/c78fcff7b75b604a7de68fb924c5b0a86bb56c7cf544c388e2fe23ce7b485744-d
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d
+packagefile crypto/sha256=/Users/aedev/Library/Caches/go-build/f5/f5725fd120090fbefc836a8965db16c99eed0c0c67cf7d05fe956f9386baa608-d
+packagefile encoding/hex=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b083/_pkg_.a
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile path/filepath=/Users/aedev/Library/Caches/go-build/9f/9fdf9a456783cf8c30a48167b2634f6b76243b2ac020565160eeb38e84629268-d
+packagefile syscall=/Users/aedev/Library/Caches/go-build/1c/1c2f205683ab9c706404246679993db6d728ca44538d6fb05463b87fa11527d6-d
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d
+packagefile github.com/Leopere/ship-it/internal/workday=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b169/_pkg_.a

@@ -1,0 +1,20 @@
+# import config
+packagefile bytes=/Users/aedev/Library/Caches/go-build/2a/2ae6cf00f129e81dc45f5b965fdeff8c15f47bfaa9a43b624f8fc834072ba15c-d
+packagefile encoding/json=/Users/aedev/Library/Caches/go-build/9a/9af9cebf0951918648ed2497744decc5619212fd228148496c07e021a6c47d6c-d
+packagefile github.com/Leopere/ship-it/internal/skilldoc=/Users/aedev/Library/Caches/go-build/98/989badd622ad8b3dfc1959a3d94db56f77fb0f44e5a4c0588da2056bee37c667-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile path/filepath=/Users/aedev/Library/Caches/go-build/9f/9fdf9a456783cf8c30a48167b2634f6b76243b2ac020565160eeb38e84629268-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile testing=/Users/aedev/Library/Caches/go-build/c7/c78fcff7b75b604a7de68fb924c5b0a86bb56c7cf544c388e2fe23ce7b485744-d
+packagefile encoding/json=/Users/aedev/Library/Caches/go-build/9a/9af9cebf0951918648ed2497744decc5619212fd228148496c07e021a6c47d6c-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile github.com/Leopere/ship-it/internal/cursorhook=/Users/aedev/Library/Caches/go-build/c5/c5f305dd23e18bb7c753b57b15f64e6bd30353c1100f38e86ec91a95870214bd-d
+packagefile github.com/Leopere/ship-it/internal/skilldoc=/Users/aedev/Library/Caches/go-build/98/989badd622ad8b3dfc1959a3d94db56f77fb0f44e5a4c0588da2056bee37c667-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile os/exec=/Users/aedev/Library/Caches/go-build/7e/7ee6678ad2388581d84ae2df1912b3e7e7d91a011cb4354d0ee8c09c93dd636c-d
+packagefile path/filepath=/Users/aedev/Library/Caches/go-build/9f/9fdf9a456783cf8c30a48167b2634f6b76243b2ac020565160eeb38e84629268-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile github.com/Leopere/ship-it/internal/install=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b092/_pkg_.a

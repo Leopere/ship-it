@@ -10,7 +10,7 @@ Native Codex and Cursor lifecycle hooks invoke the same binary. Session start en
 
 Run `ship-it install` once to install the binary, skill, and lifecycle hooks. Routine use requires no arguments or agent involvement.
 
-The hooks use the repository paths in their event payloads. Hook stdout stays valid JSON. Each run saves command output as it arrives in a private log under `~/.local/share/ship-it/hooks/`, with an explicit completion or failure record. Failed synchronous hooks also report their diagnostics on stderr. The Codex Stop timeout allows ten minutes for Git delivery and the bounded deployment command.
+The hooks use the repository paths in their event payloads. Hook stdout stays valid JSON. Each run saves command output as it arrives in a private log under `~/.local/share/ship-it/hooks/`, with an explicit completion or failure record. Failed synchronous hooks also report their diagnostics on stderr. The Codex Stop timeout allows 35 minutes: up to 30 minutes for the bounded deployment command and five minutes for delivery orchestration and the final hook result.
 
 When one-shot-tally observes an explicit native edit in another repository, Stop also includes that repository. Read-only access does not select a repository. Pending delivery survives a failed deployment even when Git is clean. One continuation retry is allowed for an unchanged failed edit; a new turn or edit can retry again. A successful delivery clears only its captured edit generation and exact clean revision. SessionStart keeps its original repository scope.
 

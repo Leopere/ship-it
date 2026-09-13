@@ -1,0 +1,8 @@
+# import config
+packagefile crypto=/Users/aedev/Library/Caches/go-build/68/68a79e5ca98e549b65e463f17a2be8ba28b6209cbfc8c50f3d27ca0bf6283924-d
+packagefile crypto/internal/boring=/Users/aedev/Library/Caches/go-build/d3/d3078d8cc963a511801ef5264a3e575b9da652e393476137a7fe908d592dba46-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile hash=/Users/aedev/Library/Caches/go-build/1d/1d0528ba6cd47d76fbdd5c22d2fecf0ec13f0197fff1613735a3d003969bc86b-d
+packagefile internal/byteorder=/Users/aedev/Library/Caches/go-build/4f/4f50afa11349d89988ce69f8aee1c18a4795f592c4139f0858b33bd6f1b76db6-d
+packagefile internal/cpu=/Users/aedev/Library/Caches/go-build/db/db7502e53ab28877dabede39da5235bbea9f9bb9abf5761fafb573e0340a46e7-d
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d

@@ -1,0 +1,5 @@
+# import config
+packagefile bufio=/Users/aedev/Library/Caches/go-build/fe/fed78e1487a8b37b836f20e63553dae5fe367d542e8b678df92ada4d964d6065-d
+packagefile bytes=/Users/aedev/Library/Caches/go-build/2a/2ae6cf00f129e81dc45f5b965fdeff8c15f47bfaa9a43b624f8fc834072ba15c-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d

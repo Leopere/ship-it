@@ -1,0 +1,7 @@
+# import config
+importmap golang.org/x/net/idna=vendor/golang.org/x/net/idna
+packagefile vendor/golang.org/x/net/idna=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b152/_pkg_.a
+packagefile net=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b140/_pkg_.a
+packagefile net/textproto=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b159/_pkg_.a
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

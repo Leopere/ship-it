@@ -1,0 +1,11 @@
+{"event":"Stop","roots":["/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work"],"ship_it":"started","time":"2026-09-13T22:02:52.677935Z"}
+ship-it: waiting for repository lock: /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+ship-it: pulling upstream
+Already up to date.
+ship-it: committing and pushing completed work
+[main 11dc6a2] Update first.txt
+ 1 file changed, 1 insertion(+)
+ create mode 100644 first.txt
+To /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first.git
+   3f7ae6d..11dc6a2  main -> main
+{"event":"Stop","roots":["/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work"],"ship_it":"completed","time":"2026-09-13T22:02:53.000012Z"}

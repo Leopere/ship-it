@@ -1,0 +1,7 @@
+# import config
+importmap golang.org/x/text/transform=vendor/golang.org/x/text/transform
+importmap golang.org/x/text/unicode/bidi=vendor/golang.org/x/text/unicode/bidi
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile vendor/golang.org/x/text/transform=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b154/_pkg_.a
+packagefile vendor/golang.org/x/text/unicode/bidi=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b155/_pkg_.a
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

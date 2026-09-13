@@ -1,0 +1,8 @@
+# import config
+packagefile context=/Users/aedev/Library/Caches/go-build/66/66f1b1975b556142504a4913e698cdfd24641ebcf96c294df9b97475d65447c1-d
+packagefile crypto/tls=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b103/_pkg_.a
+packagefile internal/nettrace=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b143/_pkg_.a
+packagefile net=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b140/_pkg_.a
+packagefile net/textproto=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b159/_pkg_.a
+packagefile reflect=/Users/aedev/Library/Caches/go-build/cc/cc8d3807c5afa08aa51c87a3332cd8b2502ca9e3d1874a062162976ecdd93b6f-d
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d

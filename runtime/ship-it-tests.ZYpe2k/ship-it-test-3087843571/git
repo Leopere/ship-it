@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+"$REAL_GIT" "$@"
+status=$?
+if [ "$status" -eq 0 ] && [ "${3:-}" = push ]; then
+  printf 'concurrent edit\n' > "$POST_PUSH_EDIT"
+fi
+exit "$status"

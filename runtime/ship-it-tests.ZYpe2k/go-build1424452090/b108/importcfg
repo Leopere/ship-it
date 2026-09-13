@@ -1,0 +1,9 @@
+# import config
+packagefile crypto/internal/nistec/fiat=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b109/_pkg_.a
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile embed=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b110/_pkg_.a
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile internal/byteorder=/Users/aedev/Library/Caches/go-build/4f/4f50afa11349d89988ce69f8aee1c18a4795f592c4139f0858b33bd6f1b76db6-d
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d
+packagefile runtime=/Users/aedev/Library/Caches/go-build/b5/b559869a622d309cee292c4eb418b8e7233deda625eb276886bea07e8bd4b316-d
+packagefile sync=/Users/aedev/Library/Caches/go-build/8e/8e6d425993b98ed7a235271702e429fcbcf0ba6f826d64e3d8b1ffaf0b730d8c-d

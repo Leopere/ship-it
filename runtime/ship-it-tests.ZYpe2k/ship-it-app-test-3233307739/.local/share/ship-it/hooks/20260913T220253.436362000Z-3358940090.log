@@ -1,0 +1,23 @@
+{"event":"Stop","roots":["/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-688331186/outside"],"ship_it":"started","time":"2026-09-13T22:02:53.436436Z"}
+ship-it: waiting for repository lock: /Volumes/macmini dump/Dev/ship-it
+ship-it: pulling upstream
+Already up to date.
+ship-it: committing and pushing completed work
+warning: adding embedded git repository: runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-seed
+hint: You've added another git repository inside your current repository.
+hint: Clones of the outer repository will not contain the contents of
+hint: the embedded repository and will not know how to obtain it.
+hint: If you meant to add a submodule, use:
+hint:
+hint: 	git submodule add <url> runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-seed
+hint:
+hint: If you added this path by mistake, you can remove it from the
+hint: index with:
+hint:
+hint: 	git rm --cached runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-seed
+hint:
+hint: See "git help submodule" for more information.
+hint: Disable this message with "git config set advice.addEmbeddedRepo false"
+warning: adding embedded git repository: runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+warning: adding embedded git repository: runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-seed
+warning: adding embedded git repository: runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work

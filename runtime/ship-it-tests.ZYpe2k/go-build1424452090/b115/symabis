@@ -1,0 +1,2 @@
+def crypto/sha512.blockAsm ABI0
+ref crypto/sha512._K ABI0

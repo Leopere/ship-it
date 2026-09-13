@@ -1,0 +1,11 @@
+# import config
+importmap golang.org/x/text/secure/bidirule=vendor/golang.org/x/text/secure/bidirule
+importmap golang.org/x/text/unicode/bidi=vendor/golang.org/x/text/unicode/bidi
+importmap golang.org/x/text/unicode/norm=vendor/golang.org/x/text/unicode/norm
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile vendor/golang.org/x/text/secure/bidirule=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b153/_pkg_.a
+packagefile vendor/golang.org/x/text/unicode/bidi=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b155/_pkg_.a
+packagefile vendor/golang.org/x/text/unicode/norm=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b158/_pkg_.a
+packagefile math=/Users/aedev/Library/Caches/go-build/2e/2eb5c084c7bfdf309e490fe8f181b029da653d189f61c9d6e446ca10c3fe4884-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

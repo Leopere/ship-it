@@ -1,0 +1,10 @@
+{
+	"Patterns": {
+		"p256_asm_table.bin": [
+			"p256_asm_table.bin"
+		]
+	},
+	"Files": {
+		"p256_asm_table.bin": "/opt/homebrew/Cellar/go/1.23.5/libexec/src/crypto/internal/nistec/p256_asm_table.bin"
+	}
+}

@@ -1,0 +1,14 @@
+{"event":"stop","roots":["/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work","/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work/nested","/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work"],"ship_it":"started","time":"2026-09-13T22:02:53.010675Z"}
+ship-it: waiting for repository lock: /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+ship-it: committing and pushing completed work
+Everything up-to-date
+ship-it: waiting for repository lock: /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work
+ship-it: pulling upstream
+Already up to date.
+ship-it: committing and pushing completed work
+[main 5ad455d] Update second.txt
+ 1 file changed, 1 insertion(+)
+ create mode 100644 second.txt
+To /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second.git
+   3f7ae6d..5ad455d  main -> main
+{"event":"stop","roots":["/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work","/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work/nested","/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work"],"ship_it":"completed","time":"2026-09-13T22:02:53.424897Z"}

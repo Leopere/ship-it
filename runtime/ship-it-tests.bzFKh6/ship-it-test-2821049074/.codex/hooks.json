@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "'/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.bzFKh6/ship-it-test-2821049074/.local/bin/ship-it'",
+            "timeout": 300,
+            "type": "command"
+          }
+        ],
+        "matcher": "startup|resume"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "'/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.bzFKh6/ship-it-test-2821049074/.local/bin/ship-it'",
+            "timeout": 2100,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}

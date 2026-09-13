@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ship It"
+  short_description: "Pull daily and ship every coding cycle"
+  default_prompt: "Let the native lifecycle hooks run the no-argument ship-it binary. Do not run routine Git commands yourself."

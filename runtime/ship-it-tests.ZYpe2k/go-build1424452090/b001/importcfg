@@ -1,0 +1,10 @@
+# import config
+packagefile flag=/Users/aedev/Library/Caches/go-build/ba/ba150274c58a1c0b84415d628f0ae8a607fabee20b00ced9d5d7cfdb8f123729-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile go/parser=/Users/aedev/Library/Caches/go-build/4c/4c2ff02711b41244f2b2a599fe073bcb03e24d458fb9bb58a663790124ceb030-d
+packagefile go/token=/Users/aedev/Library/Caches/go-build/1a/1a010507e753496cbbe93700574ef86b5d9e7dd22f635cc188c8b586cfafd117-d
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile path/filepath=/Users/aedev/Library/Caches/go-build/9f/9fdf9a456783cf8c30a48167b2634f6b76243b2ac020565160eeb38e84629268-d
+packagefile strconv=/Users/aedev/Library/Caches/go-build/ee/ee9c10aa579918d79c443cdbad4434ede6071db5e24de288b2f90301d88a7c64-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile runtime=/Users/aedev/Library/Caches/go-build/b5/b559869a622d309cee292c4eb418b8e7233deda625eb276886bea07e8bd4b316-d

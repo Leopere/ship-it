@@ -1,0 +1,13 @@
+# import config
+importmap golang.org/x/crypto/chacha20poly1305=vendor/golang.org/x/crypto/chacha20poly1305
+importmap golang.org/x/crypto/hkdf=vendor/golang.org/x/crypto/hkdf
+packagefile crypto=/Users/aedev/Library/Caches/go-build/68/68a79e5ca98e549b65e463f17a2be8ba28b6209cbfc8c50f3d27ca0bf6283924-d
+packagefile crypto/aes=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b104/_pkg_.a
+packagefile crypto/cipher=/Users/aedev/Library/Caches/go-build/38/3872418ef585371e263b5aac695b5807e3c5f0dee1937cf746bacc399ad0fa3c-d
+packagefile crypto/ecdh=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b106/_pkg_.a
+packagefile crypto/rand=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b071/_pkg_.a
+packagefile encoding/binary=/Users/aedev/Library/Caches/go-build/a5/a56c3a6725e7ef5db65b0805400a117bf60618fdd27c08ae9fe5c91c6601a2d1-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile vendor/golang.org/x/crypto/chacha20poly1305=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b123/_pkg_.a
+packagefile vendor/golang.org/x/crypto/hkdf=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b127/_pkg_.a
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d

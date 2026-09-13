@@ -1,0 +1,4 @@
+# import config
+packagefile crypto/internal/boring=/Users/aedev/Library/Caches/go-build/d3/d3078d8cc963a511801ef5264a3e575b9da652e393476137a7fe908d592dba46-d
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile hash=/Users/aedev/Library/Caches/go-build/1d/1d0528ba6cd47d76fbdd5c22d2fecf0ec13f0197fff1613735a3d003969bc86b-d

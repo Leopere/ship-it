@@ -1,0 +1,659 @@
+# test log
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-seed/base.txt
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-seed/base.txt
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work/first.txt
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work/second.txt
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv HOME
+getenv PWD
+getenv PWD
+chdir /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/outside
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/hooks
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/hooks/20260913T220252.677865000Z-2022109881.log
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5/lock
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5/2026-09-13
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5/2026-09-13
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /dev/null
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/hooks
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/hooks/20260913T220253.010502000Z-2276629050.log
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5/lock
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/d1898b3b7a9b05afebe1491cf1124053447650470d95019b1abbfcb80061f1e5/2026-09-13
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /dev/null
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work/nested
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/first-work
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work
+stat /Volumes
+stat /Volumes/macmini dump
+stat /Volumes/macmini dump/Dev
+stat /Volumes/macmini dump/Dev/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-1689010569/second-work
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/b8eec85b0269b82efc5f445b778f89ff8982a9492f8afabb940ba005e987bc5c
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/b8eec85b0269b82efc5f445b778f89ff8982a9492f8afabb940ba005e987bc5c/lock
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/b8eec85b0269b82efc5f445b778f89ff8982a9492f8afabb940ba005e987bc5c/2026-09-13
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+open /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3764427785/.local/share/ship-it/workdays/b8eec85b0269b82efc5f445b778f89ff8982a9492f8afabb940ba005e987bc5c/2026-09-13
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /dev/null
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PATH
+stat /opt/homebrew/Cellar/go/1.23.5/libexec/bin/git
+stat /Users/aedev/.local/bin/git
+stat /Users/aedev/.local/bin/git
+stat /opt/homebrew/bin/git
+open /dev/null
+open /opt/homebrew/bin/git
+getenv PWD
+chdir /Volumes/macmini dump/Dev/ship-it/internal/app
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv PWD
+getenv PWD
+chdir /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-123757850/outside
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv PWD
+chdir /Volumes/macmini dump/Dev/ship-it/internal/app
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv HOME
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv PWD
+getenv SHIP_IT_KEEP_TEST_DIRS
+getenv TMPDIR
+getenv PWD
+chdir /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3978520238
+getenv SHIP_IT_BACKGROUND_WORKER
+getenv HOME
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3233307739/.local/share/ship-it/hooks
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3233307739/.local/share/ship-it
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3233307739/.local/share
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3233307739/.local
+stat /Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/ship-it-app-test-3233307739
+open /Volumes/macmini dump/

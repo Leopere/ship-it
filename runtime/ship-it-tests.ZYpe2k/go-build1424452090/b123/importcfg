@@ -1,0 +1,10 @@
+# import config
+importmap golang.org/x/crypto/chacha20=vendor/golang.org/x/crypto/chacha20
+importmap golang.org/x/crypto/internal/alias=vendor/golang.org/x/crypto/internal/alias
+importmap golang.org/x/crypto/internal/poly1305=vendor/golang.org/x/crypto/internal/poly1305
+packagefile crypto/cipher=/Users/aedev/Library/Caches/go-build/38/3872418ef585371e263b5aac695b5807e3c5f0dee1937cf746bacc399ad0fa3c-d
+packagefile encoding/binary=/Users/aedev/Library/Caches/go-build/a5/a56c3a6725e7ef5db65b0805400a117bf60618fdd27c08ae9fe5c91c6601a2d1-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile vendor/golang.org/x/crypto/chacha20=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b124/_pkg_.a
+packagefile vendor/golang.org/x/crypto/internal/alias=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b125/_pkg_.a
+packagefile vendor/golang.org/x/crypto/internal/poly1305=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b126/_pkg_.a

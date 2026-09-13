@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "$HOME/.local/bin/ship-it"
+      }
+    ],
+    "stop": [
+      {
+        "command": "tally"
+      },
+      {
+        "command": "$HOME/.local/bin/ship-it"
+      }
+    ]
+  }
+}

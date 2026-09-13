@@ -1,0 +1,8 @@
+# import config
+importmap golang.org/x/text/transform=vendor/golang.org/x/text/transform
+packagefile encoding/binary=/Users/aedev/Library/Caches/go-build/a5/a56c3a6725e7ef5db65b0805400a117bf60618fdd27c08ae9fe5c91c6601a2d1-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile vendor/golang.org/x/text/transform=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b154/_pkg_.a
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile sync=/Users/aedev/Library/Caches/go-build/8e/8e6d425993b98ed7a235271702e429fcbcf0ba6f826d64e3d8b1ffaf0b730d8c-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

@@ -1,0 +1,4 @@
+# import config
+packagefile crypto/subtle=/Users/aedev/Library/Caches/go-build/f5/f516f0baaa629b0103789b46d266829c7d22a97cd0f28a2c98fddbb760a23e8b-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d

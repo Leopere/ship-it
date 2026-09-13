@@ -63,7 +63,10 @@ func installCodexHooks(home string, out io.Writer) error {
 		} else if hooks[event] != nil {
 			return fmt.Errorf("invalid %s hook list", event)
 		}
-		timeout := 600
+		// Stop owns Git delivery and deploy-it. The deployment contract may run
+		// for 1,800 seconds; leave five minutes for the surrounding delivery
+		// orchestration and final hook result.
+		timeout := 2100
 		if event == "SessionStart" {
 			timeout = 300
 		}

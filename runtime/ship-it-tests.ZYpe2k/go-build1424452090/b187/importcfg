@@ -1,0 +1,7 @@
+# import config
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile reflect=/Users/aedev/Library/Caches/go-build/cc/cc8d3807c5afa08aa51c87a3332cd8b2502ca9e3d1874a062162976ecdd93b6f-d
+packagefile testing=/Users/aedev/Library/Caches/go-build/c7/c78fcff7b75b604a7de68fb924c5b0a86bb56c7cf544c388e2fe23ce7b485744-d
+packagefile testing/internal/testdeps=/Users/aedev/Library/Caches/go-build/77/77d22f878d571625f5711f8f2f9aa97432f0724d10aae4afefb26b15787c5dc7-d
+packagefile runtime=/Users/aedev/Library/Caches/go-build/b5/b559869a622d309cee292c4eb418b8e7233deda625eb276886bea07e8bd4b316-d
+packagefile github.com/Leopere/ship-it/internal/gitx=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b186/_pkg_.a

@@ -1,0 +1,8 @@
+def crypto/aes.encryptBlockAsm ABI0
+def crypto/aes.decryptBlockAsm ABI0
+def crypto/aes.expandKeyAsm ABI0
+def crypto/aes.gcmAesFinish ABI0
+def crypto/aes.gcmAesInit ABI0
+def crypto/aes.gcmAesData ABI0
+def crypto/aes.gcmAesEnc ABI0
+def crypto/aes.gcmAesDec ABI0

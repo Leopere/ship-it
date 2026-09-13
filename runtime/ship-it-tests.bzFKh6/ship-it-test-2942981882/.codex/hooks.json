@@ -1,0 +1,48 @@
+{
+  "custom": true,
+  "description": "keep me",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "audit",
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "'/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.bzFKh6/ship-it-test-2942981882/.local/bin/ship-it'",
+            "timeout": 300,
+            "type": "command"
+          }
+        ],
+        "matcher": "startup|resume"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "tally",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "'/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.bzFKh6/ship-it-test-2942981882/.local/bin/ship-it'",
+            "timeout": 2100,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+# import config
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile io=/Users/aedev/Library/Caches/go-build/e1/e1e38481165a5e92e1356c215f31368be90b90482dbe535df00d9e6419a0650a-d
+packagefile log/internal=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b157/_pkg_.a
+packagefile os=/Users/aedev/Library/Caches/go-build/cb/cb4a84408376ac1dce747910c9afb3838bebeda6416d8e09204eee6b334f0fe0-d
+packagefile runtime=/Users/aedev/Library/Caches/go-build/b5/b559869a622d309cee292c4eb418b8e7233deda625eb276886bea07e8bd4b316-d
+packagefile sync=/Users/aedev/Library/Caches/go-build/8e/8e6d425993b98ed7a235271702e429fcbcf0ba6f826d64e3d8b1ffaf0b730d8c-d
+packagefile sync/atomic=/Users/aedev/Library/Caches/go-build/b2/b23d631ae99c5b0b682b5ee273307912613644fda76ba71cc88d2f99d4b1a989-d
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d

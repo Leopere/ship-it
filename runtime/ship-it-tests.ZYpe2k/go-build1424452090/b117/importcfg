@@ -1,0 +1,13 @@
+# import config
+packagefile bytes=/Users/aedev/Library/Caches/go-build/2a/2ae6cf00f129e81dc45f5b965fdeff8c15f47bfaa9a43b624f8fc834072ba15c-d
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile fmt=/Users/aedev/Library/Caches/go-build/48/4837330535f17e0f8816377f37465f986a9513530bd9535c33066dc582cf2906-d
+packagefile math=/Users/aedev/Library/Caches/go-build/2e/2eb5c084c7bfdf309e490fe8f181b029da653d189f61c9d6e446ca10c3fe4884-d
+packagefile math/big=/Volumes/macmini dump/Dev/ship-it/runtime/ship-it-tests.ZYpe2k/go-build1424452090/b080/_pkg_.a
+packagefile reflect=/Users/aedev/Library/Caches/go-build/cc/cc8d3807c5afa08aa51c87a3332cd8b2502ca9e3d1874a062162976ecdd93b6f-d
+packagefile slices=/Users/aedev/Library/Caches/go-build/16/163e75c11d5a836995c9090115db428c6e0bb000c2f7b0085859b084bd0c3420-d
+packagefile strconv=/Users/aedev/Library/Caches/go-build/ee/ee9c10aa579918d79c443cdbad4434ede6071db5e24de288b2f90301d88a7c64-d
+packagefile strings=/Users/aedev/Library/Caches/go-build/5d/5d0b0bc220f509c653fb103fa441c253beb910f5d92bbf0aa18be6bfae7036ab-d
+packagefile time=/Users/aedev/Library/Caches/go-build/65/65d16e5b0d9a6d997305a06a9baf29fde7847e9cc4825290f952d7b270e2272a-d
+packagefile unicode/utf16=/Users/aedev/Library/Caches/go-build/93/9354f73964a81337d4f3cde8b2cb70a297b431e2ca1cb973996049468d76866d-d
+packagefile unicode/utf8=/Users/aedev/Library/Caches/go-build/c3/c3a2483407732d8d11b76ff70b4bd15cbc0cadf477c0482a2a7401a62bf97c07-d

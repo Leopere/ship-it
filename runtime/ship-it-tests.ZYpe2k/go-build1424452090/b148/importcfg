@@ -1,0 +1,6 @@
+# import config
+packagefile errors=/Users/aedev/Library/Caches/go-build/38/38536c0499f3430d3d2493ae48a3a5f46bb24a117c1e66990bd5e9bb08ae900c-d
+packagefile internal/byteorder=/Users/aedev/Library/Caches/go-build/4f/4f50afa11349d89988ce69f8aee1c18a4795f592c4139f0858b33bd6f1b76db6-d
+packagefile internal/chacha8rand=/Users/aedev/Library/Caches/go-build/74/74cca914edb157cf80458536ebd9b02056e65cb157e2c3e2582bfb5f52d3441d-d
+packagefile math=/Users/aedev/Library/Caches/go-build/2e/2eb5c084c7bfdf309e490fe8f181b029da653d189f61c9d6e446ca10c3fe4884-d
+packagefile math/bits=/Users/aedev/Library/Caches/go-build/25/2513cf7355a4bc3e0c5ddc58b0fbda5777bb12da0064498a8e4b4bc1098c2055-d
