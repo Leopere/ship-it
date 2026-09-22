@@ -23,7 +23,9 @@ func retryMarker(event hookEvent) string {
 	if err != nil {
 		return ""
 	}
-	key := sha256.Sum256([]byte(event.SessionID + "\x00" + event.TurnID + "\x00" + strings.Join(hookRoots(event), "\x00")))
+	// Continuations may omit or reorder workspace roots. The saved marker
+	// already contains the exact failed roots; identify it by the stable turn.
+	key := sha256.Sum256([]byte(event.SessionID + "\x00" + event.TurnID))
 	return filepath.Join(home, ".local", "share", "ship-it", "hook-retries", fmt.Sprintf("%x", key[:16]))
 }
 

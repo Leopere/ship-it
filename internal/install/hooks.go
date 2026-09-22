@@ -9,13 +9,17 @@ import (
 	"strings"
 )
 
-// installCodexHooks preserves unrelated handlers and replaces only ship-it's handlers.
+// installCodexHooks preserves unrelated handlers and reconciles its delivery
+// and edit-observer handlers.
 func installCodexHooks(home string, out io.Writer) error {
 	configHome := os.Getenv("CODEX_HOME")
 	if configHome == "" {
 		configHome = filepath.Join(home, ".codex")
 	}
-	path := filepath.Join(configHome, "hooks.json")
+	path, err := codexHooksPath(configHome)
+	if err != nil {
+		return err
+	}
 	file := map[string]any{}
 	if data, err := os.ReadFile(path); err == nil {
 		if err := json.Unmarshal(data, &file); err != nil {
@@ -32,24 +36,35 @@ func installCodexHooks(home string, out io.Writer) error {
 		hooks = map[string]any{}
 		file["hooks"] = hooks
 	}
-	command := "'" + strings.ReplaceAll(filepath.Join(home, ".local", "bin", "ship-it"), "'", "'\"'\"'") + "'"
-	for _, event := range []string{"SessionStart", "Stop"} {
+	shipCommand := shellQuote(filepath.Join(home, ".local", "bin", "ship-it"))
+	tallyCommand := shellQuote(filepath.Join(home, ".local", "bin", "one-shot-tally"))
+	for _, spec := range []codexHookSpec{
+		{event: "SessionStart", matcher: "startup|resume", command: shipCommand, timeout: 300, owned: isShipItHook},
+		// Stop may use the 1,800-second deploy-it contract and needs five
+		// minutes for delivery orchestration and the final hook result.
+		{event: "Stop", command: shipCommand, timeout: 2100, owned: isShipItHook},
+		// one-shot-tally records successful explicit edits in the shared touched
+		// root registry. ship-it reads that registry at Stop to deliver edited
+		// repositories outside the session's initial working directory.
+		{event: "PreToolUse", matcher: "*", command: tallyCommand, timeout: 5, owned: exactCommand(tallyCommand)},
+		{event: "PostToolUse", matcher: "*", command: tallyCommand, timeout: 5, owned: exactCommand(tallyCommand)},
+	} {
 		var kept []any
-		if groups, ok := hooks[event].([]any); ok {
+		if groups, ok := hooks[spec.event].([]any); ok {
 			for _, item := range groups {
 				group, ok := item.(map[string]any)
 				if !ok {
-					return fmt.Errorf("invalid %s hook group", event)
+					return fmt.Errorf("invalid %s hook group", spec.event)
 				}
 				var handlers []any
 				if existing, ok := group["hooks"].([]any); ok {
 					for _, candidate := range existing {
 						handler, ok := candidate.(map[string]any)
 						if !ok {
-							return fmt.Errorf("invalid %s hook handler", event)
+							return fmt.Errorf("invalid %s hook handler", spec.event)
 						}
 						cmd, _ := handler["command"].(string)
-						if strings.Contains(cmd, "ship-it") {
+						if spec.owned(cmd) {
 							continue
 						}
 						handlers = append(handlers, handler)
@@ -60,22 +75,15 @@ func installCodexHooks(home string, out io.Writer) error {
 					kept = append(kept, group)
 				}
 			}
-		} else if hooks[event] != nil {
-			return fmt.Errorf("invalid %s hook list", event)
-		}
-		// Stop owns Git delivery and deploy-it. The deployment contract may run
-		// for 1,800 seconds; leave five minutes for the surrounding delivery
-		// orchestration and final hook result.
-		timeout := 2100
-		if event == "SessionStart" {
-			timeout = 300
+		} else if hooks[spec.event] != nil {
+			return fmt.Errorf("invalid %s hook list", spec.event)
 		}
 		group := map[string]any{}
-		if event == "SessionStart" {
-			group["matcher"] = "startup|resume"
+		if spec.matcher != "" {
+			group["matcher"] = spec.matcher
 		}
-		group["hooks"] = []any{map[string]any{"type": "command", "command": command, "timeout": timeout}}
-		hooks[event] = append(kept, group)
+		group["hooks"] = []any{map[string]any{"type": "command", "command": spec.command, "timeout": spec.timeout}}
+		hooks[spec.event] = append(kept, group)
 	}
 	data, err := json.MarshalIndent(file, "", "  ")
 	if err != nil {
@@ -86,6 +94,45 @@ func installCodexHooks(home string, out io.Writer) error {
 	}
 	fmt.Fprintln(out, "Installed native Codex lifecycle hooks in", path)
 	return nil
+}
+
+type codexHookSpec struct {
+	event   string
+	matcher string
+	command string
+	timeout int
+	owned   func(string) bool
+}
+
+func shellQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\"'\"'") + "'"
+}
+
+func isShipItHook(command string) bool { return strings.Contains(command, "ship-it") }
+
+func exactCommand(want string) func(string) bool {
+	return func(command string) bool { return strings.TrimSpace(command) == want }
+}
+
+// codexHooksPath writes through an account-specific hooks.json symlink instead
+// of replacing it with an atomic rename. Codex account tooling owns that link.
+func codexHooksPath(configHome string) (string, error) {
+	path := filepath.Join(configHome, "hooks.json")
+	info, err := os.Lstat(path)
+	if os.IsNotExist(err) {
+		return path, nil
+	}
+	if err != nil {
+		return "", err
+	}
+	if info.Mode()&os.ModeSymlink == 0 {
+		return path, nil
+	}
+	resolved, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return "", fmt.Errorf("resolve Codex hooks link %s: %w", path, err)
+	}
+	return resolved, nil
 }
 
 func updateDeliveryGuidance(home string) error {

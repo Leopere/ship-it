@@ -52,6 +52,34 @@ func TestPullGetsLatestUpstreamCode(t *testing.T) {
 	}
 }
 
+func TestRepositoryIgnoresGeneratedUnbornTestRepositories(t *testing.T) {
+	f := newFixture(t)
+	ignore, err := os.ReadFile(filepath.Join("..", "..", ".gitignore"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(f.work, ".gitignore"), string(ignore))
+	nested := filepath.Join(f.work, "runtime", "ship-it-tests.regression", "unborn")
+	runGit(t, f.work, "init", nested)
+	write(t, filepath.Join(nested, "fixture.txt"), "local fixture\n")
+	write(t, filepath.Join(f.work, "real-change.txt"), "ship this\n")
+	var output bytes.Buffer
+	repo, err := Open(f.work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Ship(); err != nil {
+		t.Fatalf("generated repository blocked shipping: %v\n%s", err, output.String())
+	}
+	tracked, err := exec.Command("git", "-C", f.work, "ls-files", "runtime/").Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tracked) != 0 {
+		t.Fatalf("generated test artifacts entered the commit: %s", tracked)
+	}
+}
+
 func TestShipStagesCommitsAndPushesEverything(t *testing.T) {
 	f := newFixture(t)
 	if err := os.Remove(filepath.Join(f.work, "tracked.txt")); err != nil {

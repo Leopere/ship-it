@@ -40,7 +40,7 @@ func TestCodexHooksPreserveOtherHandlersAndInstallIdempotently(t *testing.T) {
 		t.Fatal("top-level settings were lost")
 	}
 	hooks := file["hooks"].(map[string]any)
-	if len(hooks["PreToolUse"].([]any)) != 1 || len(hooks["Stop"].([]any)) != 2 {
+	if len(hooks["PreToolUse"].([]any)) != 2 || len(hooks["PostToolUse"].([]any)) != 1 || len(hooks["Stop"].([]any)) != 2 {
 		t.Fatal("unrelated hooks were lost or owned hooks duplicated")
 	}
 	for event, want := range map[string]float64{"SessionStart": 300, "Stop": 2100} {
@@ -55,11 +55,72 @@ func TestCodexHooksPreserveOtherHandlersAndInstallIdempotently(t *testing.T) {
 	if start["matcher"] != "startup|resume" {
 		t.Fatal("startup matcher includes mid-turn baseline resets")
 	}
+	for _, event := range []string{"PreToolUse", "PostToolUse"} {
+		groups := hooks[event].([]any)
+		group := groups[len(groups)-1].(map[string]any)
+		if group["matcher"] != "*" {
+			t.Fatalf("%s matcher = %v", event, group["matcher"])
+		}
+		handler := group["hooks"].([]any)[0].(map[string]any)
+		if handler["command"] != "'"+filepath.Join(home, ".local", "bin", "one-shot-tally")+"'" || handler["timeout"] != float64(5) {
+			t.Fatalf("%s observer = %#v", event, handler)
+		}
+	}
 	if strings.Contains(string(first), "followup_message") {
 		t.Fatal("hooks must execute, not prompt")
 	}
 	if strings.Contains(string(first), "ship-it hook") || strings.Contains(string(first), "ship-it start") {
 		t.Fatal("hooks must invoke ship-it without arguments")
+	}
+}
+
+func TestCodexHooksFollowExistingAccountLink(t *testing.T) {
+	home := testDir(t)
+	canonicalPath := filepath.Join(home, ".codex", "hooks.json")
+	accountPath := filepath.Join(home, ".codex-accounts", "boompay", "hooks.json")
+	t.Setenv("CODEX_HOME", filepath.Dir(accountPath))
+	if err := os.MkdirAll(filepath.Dir(canonicalPath), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Dir(accountPath), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	initial := `{"description":"canonical","hooks":{"PreToolUse":[{"hooks":[{"type":"command","command":"audit"}]}]}}`
+	if err := os.WriteFile(canonicalPath, []byte(initial), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(canonicalPath, accountPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := installCodexHooks(home, io.Discard); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Lstat(accountPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode()&os.ModeSymlink == 0 {
+		t.Fatal("account hooks link was replaced")
+	}
+	data, err := os.ReadFile(canonicalPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var file map[string]any
+	if err := json.Unmarshal(data, &file); err != nil {
+		t.Fatal(err)
+	}
+	if file["description"] != "canonical" {
+		t.Fatal("canonical hooks settings were lost")
+	}
+	hooks := file["hooks"].(map[string]any)
+	if len(hooks["PreToolUse"].([]any)) != 2 {
+		t.Fatal("canonical unrelated hooks were lost")
+	}
+	stop := hooks["Stop"].([]any)
+	handler := stop[len(stop)-1].(map[string]any)["hooks"].([]any)[0].(map[string]any)
+	if handler["timeout"] != float64(2100) {
+		t.Fatalf("Stop timeout = %v", handler["timeout"])
 	}
 }
 

@@ -63,3 +63,26 @@ func TestFailedDeliveryAllowsOneCleanContinuation(t *testing.T) {
 		t.Fatal("retry leaked into another turn")
 	}
 }
+
+func TestFailedDeliveryRetrySurvivesIncompleteContinuationRoots(t *testing.T) {
+	t.Setenv("HOME", testDir(t))
+	failedRoot := testDir(t)
+	event := hookEvent{Name: "Stop", SessionID: "session", TurnID: "turn", CWD: failedRoot}
+	if err := updateDeliveryRetry(event, []string{failedRoot}); err != nil {
+		t.Fatal(err)
+	}
+	continuation := hookEvent{Name: "Stop", SessionID: event.SessionID, TurnID: event.TurnID, StopHookActive: true}
+	if _, run := lifecycleMode(continuation); !run {
+		t.Fatal("missing continuation roots hid the saved failed delivery")
+	}
+	roots := deliveryRetryRoots(continuation)
+	if len(roots) != 1 || roots[0] != failedRoot {
+		t.Fatalf("continuation lost the exact failed root: %v", roots)
+	}
+	if err := updateDeliveryRetry(continuation, roots); err != nil {
+		t.Fatal(err)
+	}
+	if hasDeliveryRetry(event) {
+		t.Fatal("continuation did not consume its one retry")
+	}
+}
