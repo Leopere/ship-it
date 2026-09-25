@@ -52,6 +52,34 @@ func TestPullGetsLatestUpstreamCode(t *testing.T) {
 	}
 }
 
+func TestPullMergesConfiguredDivergenceAndPreservesPendingWork(t *testing.T) {
+	f := newFixture(t)
+	runGit(t, f.work, "config", "pull.rebase", "false")
+	write(t, filepath.Join(f.work, "local.txt"), "local commit\n")
+	runGit(t, f.work, "add", ".")
+	runGit(t, f.work, "commit", "-m", "local")
+	local := strings.TrimSpace(outputGit(t, f.work, "rev-parse", "HEAD"))
+	write(t, filepath.Join(f.seed, "remote.txt"), "upstream commit\n")
+	runGit(t, f.seed, "add", ".")
+	runGit(t, f.seed, "commit", "-m", "upstream")
+	runGit(t, f.seed, "push")
+	remote := strings.TrimSpace(outputGit(t, f.seed, "rev-parse", "HEAD"))
+	write(t, filepath.Join(f.work, "tracked.txt"), "pending edit\n")
+	var output bytes.Buffer
+	repo, err := Open(f.work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("pull: %v\n%s", err, output.String())
+	}
+	runGit(t, f.work, "merge-base", "--is-ancestor", local, "HEAD")
+	runGit(t, f.work, "merge-base", "--is-ancestor", remote, "HEAD")
+	if got := read(t, filepath.Join(f.work, "tracked.txt")); got != "pending edit\n" {
+		t.Fatalf("pending content = %q", got)
+	}
+}
+
 func TestRepositoryIgnoresGeneratedUnbornTestRepositories(t *testing.T) {
 	f := newFixture(t)
 	ignore, err := os.ReadFile(filepath.Join("..", "..", ".gitignore"))
