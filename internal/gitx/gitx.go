@@ -38,6 +38,28 @@ func Open(cwd string, out, errOut io.Writer) (*Repo, error) {
 }
 
 func (r *Repo) Pull() error {
+	if _, err := r.output("rev-parse", "--verify", "HEAD^{commit}"); err != nil {
+		branch, err := r.output("symbolic-ref", "--quiet", "--short", "HEAD")
+		if err != nil {
+			return err
+		}
+		remotes, err := r.configValues("branch." + strings.TrimSpace(branch) + ".remote")
+		if err != nil {
+			return err
+		}
+		remote := "origin"
+		if len(remotes) > 0 {
+			remote = remotes[len(remotes)-1]
+		}
+		refs, err := r.output("ls-remote", "--heads", remote)
+		if err != nil {
+			return err
+		}
+		// A new repository has nothing to pull until its first commit is pushed.
+		if strings.TrimSpace(refs) == "" {
+			return nil
+		}
+	}
 	return r.run("pull", "--autostash")
 }
 
@@ -83,6 +105,10 @@ func (r *Repo) Ship() error {
 		return nil
 	}
 	r.DeploymentRequired = true
+	if destinationErr != nil {
+		// push.autoSetupRemote can establish the upstream on the first push.
+		destination, destinationErr = r.pushDestination()
+	}
 	if destinationErr != nil {
 		return fmt.Errorf("Git push succeeded; resolve deployment destination: %w", destinationErr)
 	}

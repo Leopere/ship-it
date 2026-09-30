@@ -52,6 +52,64 @@ func TestPullGetsLatestUpstreamCode(t *testing.T) {
 	}
 }
 
+func TestPullThenShipBootstrapsEmptyRepository(t *testing.T) {
+	t.Setenv("GIT_CONFIG_GLOBAL", "/dev/null")
+	t.Setenv("GIT_CONFIG_SYSTEM", "/dev/null")
+	dir := testDir(t)
+	remote, work := filepath.Join(dir, "remote.git"), filepath.Join(dir, "work")
+	runGit(t, dir, "init", "--bare", remote)
+	runGit(t, dir, "init", "-b", "main", work)
+	configure(t, work)
+	runGit(t, work, "remote", "add", "origin", remote)
+	runGit(t, work, "config", "push.autoSetupRemote", "true")
+	write(t, filepath.Join(work, "index.html"), "first publication\n")
+	write(t, filepath.Join(work, ".deploy-it.json"), "{}\n")
+	record := filepath.Join(dir, "deployment")
+	write(t, filepath.Join(dir, "ship-it"), "test executable\n")
+	write(t, filepath.Join(dir, "deploy-it"), "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$DEPLOY_RECORD\"\n")
+	if err := os.Chmod(filepath.Join(dir, "deploy-it"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("DEPLOY_RECORD", record)
+	previousExecutablePath := executablePath
+	executablePath = func() (string, error) { return filepath.Join(dir, "ship-it"), nil }
+	t.Cleanup(func() { executablePath = previousExecutablePath })
+	var output bytes.Buffer
+	repo, err := Open(work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("initial pull: %v\n%s", err, output.String())
+	}
+	if err := repo.Ship(); err != nil {
+		t.Fatalf("initial ship: %v\n%s", err, output.String())
+	}
+	if got := outputGit(t, remote, "show", "main:index.html"); got != "first publication\n" {
+		t.Fatalf("published content = %q", got)
+	}
+	commit := strings.TrimSpace(outputGit(t, remote, "rev-parse", "main"))
+	if got := read(t, record); got != "--commit\n"+commit+"\n--branch\nmain\n--remote\norigin\n" {
+		t.Fatalf("deployment arguments = %q", got)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("subsequent pull: %v\n%s", err, output.String())
+	}
+}
+
+func TestInitialPullDoesNotHideInaccessibleRemote(t *testing.T) {
+	dir := testDir(t)
+	runGit(t, dir, "init", "-b", "main")
+	runGit(t, dir, "remote", "add", "origin", filepath.Join(dir, "missing.git"))
+	repo, err := Open(dir, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err == nil {
+		t.Fatal("initial pull ignored inaccessible remote")
+	}
+}
+
 func TestPullMergesConfiguredDivergenceAndPreservesPendingWork(t *testing.T) {
 	f := newFixture(t)
 	runGit(t, f.work, "config", "pull.rebase", "false")
