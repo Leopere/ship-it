@@ -20,6 +20,36 @@ const (
 )
 
 func Run(root string, now time.Time, mode Mode, pull, ship func() error) error {
+	return withLock(root, func(dir string) error {
+		marker := filepath.Join(dir, now.Format("2006-01-02"))
+		first := false
+		if _, err := os.Stat(marker); os.IsNotExist(err) {
+			first = true
+		} else if err != nil {
+			return err
+		}
+		if first {
+			if err := pull(); err != nil {
+				return err
+			}
+			if err := os.WriteFile(marker, nil, 0o600); err != nil {
+				return err
+			}
+		}
+		if mode == Start {
+			return nil
+		}
+		return ship()
+	})
+}
+
+// WithLock serializes deployment with this repository's pulls and publications.
+// It does not pull or change the daily marker when a deferred handoff resumes.
+func WithLock(root string, action func() error) error {
+	return withLock(root, func(string) error { return action() })
+}
+
+func withLock(root string, action func(string) error) error {
 	root, err := filepath.EvalSymlinks(root)
 	if err != nil {
 		return err
@@ -46,23 +76,5 @@ func Run(root string, now time.Time, mode Mode, pull, ship func() error) error {
 		return fmt.Errorf("lock repository: %w", err)
 	}
 	defer syscall.Flock(int(lock.Fd()), syscall.LOCK_UN)
-	marker := filepath.Join(dir, now.Format("2006-01-02"))
-	first := false
-	if _, err := os.Stat(marker); os.IsNotExist(err) {
-		first = true
-	} else if err != nil {
-		return err
-	}
-	if first {
-		if err := pull(); err != nil {
-			return err
-		}
-		if err := os.WriteFile(marker, nil, 0o600); err != nil {
-			return err
-		}
-	}
-	if mode == Start {
-		return nil
-	}
-	return ship()
+	return action(dir)
 }

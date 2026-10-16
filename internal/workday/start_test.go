@@ -107,3 +107,56 @@ func testDir(t *testing.T) string {
 	}
 	return dir
 }
+
+func TestDeploymentLockSerializesWithPublicationWithoutPulling(t *testing.T) {
+	t.Setenv("HOME", testDir(t))
+	root := testDir(t)
+	alias := filepath.Join(testDir(t), "alias")
+	if err := os.Symlink(root, alias); err != nil {
+		t.Fatal(err)
+	}
+	entered, release := make(chan struct{}), make(chan struct{})
+	deployed := make(chan error, 1)
+	go func() {
+		deployed <- WithLock(alias, func() error {
+			close(entered)
+			<-release
+			return nil
+		})
+	}()
+	select {
+	case <-entered:
+	case err := <-deployed:
+		t.Fatalf("deployment lock: %v", err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("deployment lock timed out")
+	}
+	pulled, published := make(chan struct{}), make(chan error, 1)
+	go func() {
+		published <- Run(root, time.Now(), Stop, func() error { close(pulled); return nil }, func() error { return nil })
+	}()
+	select {
+	case <-pulled:
+		t.Error("publication pulled while deployment held the repository lock")
+	case err := <-published:
+		t.Errorf("publication escaped repository lock: %v", err)
+	case <-time.After(100 * time.Millisecond):
+	}
+	close(release)
+	if err := <-deployed; err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-published:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("publication did not resume after deployment")
+	}
+	select {
+	case <-pulled:
+	default:
+		t.Fatal("deployment lock advanced the daily marker without pulling")
+	}
+}

@@ -110,18 +110,30 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 	var reports []deliveryTallyResult
 	var failedRoots []string
 	deliveredTouchedRoots := make(map[string]uint64)
-	failedTouchedRoots := make(map[string]uint64)
+	failedTouchedRoots := make(map[string]deliveryRootAttempt)
+	attemptedSnapshots := make(map[string]string)
+	var before func(string)
+	if mode == workday.Stop {
+		before = func(root string) {
+			attemptedSnapshots[root] = deliveryWorktreeSnapshot(root)
+		}
+	}
 	allFailuresReported := true
 	var observe func(string, *gitx.Repo, error)
 	if mode == workday.Stop && event.SessionID != "" && event.TurnID != "" {
 		observe = func(root string, repo *gitx.Repo, deliveryErr error) {
 			if deliveryErr != nil {
 				failedRoots = append(failedRoots, root)
-				if generation, touched := touchedRoots[root]; touched {
-					failedTouchedRoots[root] = generation
+				snapshot, attempted := attemptedSnapshots[root]
+				generation, touched := touchedRoots[root]
+				if attempted || touched {
+					if snapshot == "" {
+						snapshot = "unavailable"
+					}
+					failedTouchedRoots[root] = deliveryRootAttempt{Generation: generation, Snapshot: snapshot}
 				}
-			} else if generation, touched := touchedRoots[root]; touched && repo != nil && deliveredExactCleanRoot(root, repo.DeliveryCommit) {
-				deliveredTouchedRoots[root] = generation
+			} else if repo != nil && deliveredExactCleanRoot(root, repo.DeliveryCommit) {
+				deliveredTouchedRoots[root] = touchedRoots[root]
 			}
 			commit, kind := "", "ship"
 			if repo != nil {
@@ -152,7 +164,7 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 			reports = append(reports, report)
 		}
 	}
-	err := runRepositoriesObserved(roots, mode, destination, destination, observe)
+	err := runRepositoriesObserved(roots, mode, destination, destination, before, observe)
 	if mode == workday.Stop {
 		if finalizeErr := finalizeTouchedRoots(event.SessionID, event.TurnID, deliveredTouchedRoots, failedTouchedRoots); finalizeErr != nil {
 			fmt.Fprintf(destination, "ship-it: could not finalize touched roots: %v\n", finalizeErr)
@@ -273,12 +285,18 @@ func hookRoots(event hookEvent) []string {
 }
 
 func runRepositories(roots []string, mode workday.Mode, out, errOut io.Writer) error {
-	return runRepositoriesObserved(roots, mode, out, errOut, nil)
+	return runRepositoriesObserved(roots, mode, out, errOut, nil, nil)
 }
 
-func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.Writer, observe func(string, *gitx.Repo, error)) error {
+func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.Writer, before func(string), observe func(string, *gitx.Repo, error)) error {
 	seen := make(map[string]struct{}, len(roots))
 	var failures []error
+	type deployment struct {
+		root   string
+		repo   *gitx.Repo
+		deploy func() error
+	}
+	var pending []deployment
 	for _, root := range roots {
 		if hasTrashComponent(root) {
 			continue
@@ -303,21 +321,41 @@ func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.W
 			continue
 		}
 		seen[canonicalRoot] = struct{}{}
+		if before != nil {
+			before(canonicalRoot)
+		}
 		fmt.Fprintf(out, "ship-it: waiting for repository lock: %s\n", canonicalRoot)
 		pull := func() error {
 			fmt.Fprintln(out, "ship-it: pulling upstream")
 			return repo.Pull()
 		}
+		var deploy func() error
 		ship := func() error {
 			fmt.Fprintln(out, "ship-it: committing and pushing completed work")
-			return repo.Ship()
+			var err error
+			deploy, err = repo.Publish()
+			return err
 		}
 		err = workday.Run(repo.Root, time.Now(), mode, pull, ship)
 		if err != nil {
 			failures = append(failures, fmt.Errorf("%s: %w", root, err))
 		}
-		if observe != nil {
+		if err == nil && deploy != nil {
+			pending = append(pending, deployment{canonicalRoot, repo, deploy})
+		} else if observe != nil {
 			observe(canonicalRoot, repo, err)
+		}
+	}
+	// Never hold multiple repository locks. Reacquire the publication lock for
+	// each handoff; deploy-it rejects a revision superseded between the passes.
+	for _, delivery := range pending {
+		fmt.Fprintf(out, "ship-it: waiting for repository lock: %s\n", delivery.root)
+		err := workday.WithLock(delivery.repo.Root, delivery.deploy)
+		if err != nil {
+			failures = append(failures, fmt.Errorf("%s: %w", delivery.root, err))
+		}
+		if observe != nil {
+			observe(delivery.root, delivery.repo, err)
 		}
 	}
 	return errors.Join(failures...)

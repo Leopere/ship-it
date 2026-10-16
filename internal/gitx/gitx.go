@@ -64,45 +64,56 @@ func (r *Repo) Pull() error {
 }
 
 func (r *Repo) Ship() error {
-	if err := r.run("add", "."); err != nil {
+	deploy, err := r.Publish()
+	if err != nil || deploy == nil {
 		return err
+	}
+	return deploy()
+}
+
+// Publish commits and pushes, then returns the deployment handoff, if required.
+// The handoff captures this publication's revision and destination, not later HEAD.
+func (r *Repo) Publish() (func() error, error) {
+	r.DeliveryCommit = ""
+	r.DeploymentRequired = false
+	if err := r.run("add", "."); err != nil {
+		return nil, err
 	}
 	changed, err := r.hasStagedChanges()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if changed {
 		message, err := r.autoMessage()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if err := r.run("commit", "--no-verify", "--no-gpg-sign", "-m", message); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	pushedCommit, err := r.output("rev-parse", "--verify", "HEAD^{commit}")
 	if err != nil {
-		return errors.New("repository has no commit to ship")
+		return nil, errors.New("repository has no commit to ship")
 	}
 	pushedCommit = strings.TrimSpace(pushedCommit)
 	r.DeliveryCommit = pushedCommit
-	r.DeploymentRequired = false
 	// Resolve this before pushing, so the deployment proves the exact
 	// destination selected by the same bare git push. A missing contract still
 	// permits the normal push; deployment reports an unsafe destination only
 	// after the successful push establishes the handoff boundary.
 	destination, destinationErr := r.pushDestination()
 	if err := r.run("push", "--no-verify"); err != nil {
-		return fmt.Errorf("Git push failed: %w", err)
+		return nil, fmt.Errorf("Git push failed: %w", err)
 	}
 	// Only a tracked deployment contract opts this repository into deployment.
 	cmd := exec.Command("git", "-C", r.Root, "ls-tree", "--name-only", pushedCommit, "--", ".deploy-it.json")
 	contract, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Git push succeeded; read deployment contract: %w", err)
+		return nil, fmt.Errorf("Git push succeeded; read deployment contract: %w", err)
 	}
 	if strings.TrimSpace(string(contract)) == "" {
-		return nil
+		return nil, nil
 	}
 	r.DeploymentRequired = true
 	if destinationErr != nil {
@@ -110,19 +121,21 @@ func (r *Repo) Ship() error {
 		destination, destinationErr = r.pushDestination()
 	}
 	if destinationErr != nil {
-		return fmt.Errorf("Git push succeeded; resolve deployment destination: %w", destinationErr)
+		return nil, fmt.Errorf("Git push succeeded; resolve deployment destination: %w", destinationErr)
 	}
-	deployIt, err := deployItPath()
-	if err != nil {
-		return fmt.Errorf("Git push succeeded; find deploy-it: %w", err)
-	}
-	cmd = exec.Command(deployIt, "--commit", pushedCommit, "--branch", destination.Branch, "--remote", destination.Remote)
-	cmd.Dir = r.Root
-	cmd.Stdout, cmd.Stderr = r.Out, r.Err
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("Git push succeeded; deployment failed: %w", err)
-	}
-	return nil
+	return func() error {
+		deployIt, err := deployItPath()
+		if err != nil {
+			return fmt.Errorf("Git push succeeded; find deploy-it: %w", err)
+		}
+		cmd := exec.Command(deployIt, "--commit", pushedCommit, "--branch", destination.Branch, "--remote", destination.Remote)
+		cmd.Dir = r.Root
+		cmd.Stdout, cmd.Stderr = r.Out, r.Err
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("Git push succeeded; deployment failed: %w", err)
+		}
+		return nil
+	}, nil
 }
 
 type pushDestination struct {

@@ -120,7 +120,7 @@ func explicitRootNeedsDelivery(event hookEvent, root string) bool {
 	canonical := canonicalRetryRoot(root)
 	generation := canonicalRegistryRoots(registry)[canonical]
 	attempt := registry.Attempts[canonical]
-	return attempt.TurnID != event.TurnID || generation > attempt.Generation
+	return failedRootNeedsRetry(canonical, event.TurnID, generation, attempt)
 }
 
 func canonicalRetryRoot(root string) string {

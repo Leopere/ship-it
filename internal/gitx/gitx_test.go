@@ -463,3 +463,46 @@ func testDir(t *testing.T) string {
 	}
 	return dir
 }
+
+func TestPublishCapturesDeploymentBeforeHeadAndDestinationChange(t *testing.T) {
+	f := newFixture(t)
+	bin := testDir(t)
+	record := filepath.Join(bin, "deployment")
+	write(t, filepath.Join(bin, "ship-it"), "test executable\n")
+	write(t, filepath.Join(bin, "deploy-it"), "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$DEPLOY_RECORD\"\n")
+	if err := os.Chmod(filepath.Join(bin, "deploy-it"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("DEPLOY_RECORD", record)
+	previousExecutablePath := executablePath
+	executablePath = func() (string, error) { return filepath.Join(bin, "ship-it"), nil }
+	t.Cleanup(func() { executablePath = previousExecutablePath })
+	write(t, filepath.Join(f.work, ".deploy-it.json"), "{}\n")
+	repo, err := Open(f.work, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	deploy, err := repo.Publish()
+	if err != nil || deploy == nil {
+		t.Fatalf("publish = %v, handoff present = %v", err, deploy != nil)
+	}
+	if _, err := os.Stat(record); !os.IsNotExist(err) {
+		t.Fatalf("publish ran deployment: %v", err)
+	}
+	commit := strings.TrimSpace(outputGit(t, f.remote, "rev-parse", "main"))
+	runGit(t, f.work, "checkout", "-b", "later")
+	runGit(t, f.work, "rm", ".deploy-it.json")
+	runGit(t, f.work, "commit", "-m", "later local work")
+	runGit(t, f.work, "remote", "add", "later", filepath.Join(bin, "later.git"))
+	runGit(t, f.work, "config", "remote.pushDefault", "later")
+	if err := deploy(); err != nil {
+		t.Fatal(err)
+	}
+	want := "--commit\n" + commit + "\n--branch\nmain\n--remote\norigin\n"
+	if got := read(t, record); got != want {
+		t.Fatalf("captured deployment = %q, want %q", got, want)
+	}
+	if repo.DeliveryCommit != commit || !repo.DeploymentRequired {
+		t.Fatalf("delivery metadata changed: %+v", repo)
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Leopere/ship-it/internal/gitx"
 	"github.com/Leopere/ship-it/internal/workday"
 )
 
@@ -303,5 +304,78 @@ func write(t *testing.T, path, content string) {
 	t.Helper()
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestPublishAllRepositoriesBeforeDeployment(t *testing.T) {
+	for _, scenario := range []string{"success", "push failure", "deployment failure"} {
+		t.Run(scenario, func(t *testing.T) {
+			t.Setenv("HOME", testDir(t))
+			root, err := filepath.EvalSymlinks(testDir(t))
+			if err != nil {
+				t.Fatal(err)
+			}
+			firstRemote, first := newRepository(t, root, "first")
+			secondRemote, second := newRepository(t, root, "second")
+			trace := filepath.Join(root, "trace")
+			t.Setenv("DELIVERY_TRACE", trace)
+			t.Setenv("SECOND_REMOTE", secondRemote)
+			t.Setenv("FIRST_WORK", first)
+			t.Setenv("FAIL_DEPLOYMENT", scenario)
+			for _, pair := range [][2]string{{firstRemote, first}, {secondRemote, second}} {
+				write(t, filepath.Join(pair[1], ".deploy-it.json"), "{}\n")
+				hook := filepath.Join(pair[0], "hooks", "post-receive")
+				write(t, hook, "#!/bin/sh\nprintf 'push %s\\n' \"$PWD\" >> \"$DELIVERY_TRACE\"\n")
+				if err := os.Chmod(hook, 0o755); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if scenario == "push failure" {
+				runGit(t, first, "remote", "set-url", "--push", "origin", filepath.Join(root, "missing.git"))
+			}
+			deploy := filepath.Join(root, "deploy-it")
+			write(t, deploy, `#!/bin/sh
+set -eu
+# Every selected publication must finish before even the first observer starts.
+git -C "$SECOND_REMOTE" cat-file -e main:.deploy-it.json
+printf 'deploy %s\n' "$PWD" >> "$DELIVERY_TRACE"
+if [ "$PWD" = "$FIRST_WORK" ] && [ "$FAIL_DEPLOYMENT" = 'deployment failure' ]; then exit 23; fi
+`)
+			if err := os.Chmod(deploy, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			t.Setenv("PATH", root+string(os.PathListSeparator)+os.Getenv("PATH"))
+			var output bytes.Buffer
+			observed := make(map[string]error)
+			err = runRepositoriesObserved([]string{first, second, first}, workday.Stop, &output, &output, nil, func(root string, repo *gitx.Repo, err error) {
+				if _, duplicate := observed[root]; duplicate {
+					t.Fatalf("duplicate final result for %s", root)
+				}
+				observed[root] = err
+				if err == nil || repo.DeploymentRequired {
+					data, readErr := os.ReadFile(trace)
+					if readErr != nil || !strings.Contains(string(data), "deploy "+root+"\n") {
+						t.Fatalf("observed final result before deployment: %s, %v, %s", root, readErr, data)
+					}
+				}
+			})
+			if (err != nil) != (scenario != "success") {
+				t.Fatalf("result = %v\n%s", err, output.String())
+			}
+			if len(observed) != 2 || observed[second] != nil || (observed[first] != nil) != (scenario != "success") {
+				t.Fatalf("final results = %v", observed)
+			}
+			data, readErr := os.ReadFile(trace)
+			if readErr != nil {
+				t.Fatal(readErr)
+			}
+			want := "push " + firstRemote + "\npush " + secondRemote + "\ndeploy " + first + "\ndeploy " + second + "\n"
+			if scenario == "push failure" {
+				want = "push " + secondRemote + "\ndeploy " + second + "\n"
+			}
+			if string(data) != want {
+				t.Fatalf("delivery order = %q, want %q\n%s", data, want, output.String())
+			}
+		})
 	}
 }
