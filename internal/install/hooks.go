@@ -40,12 +40,14 @@ func installCodexHooks(home string, out io.Writer) error {
 	tallyCommand := shellQuote(filepath.Join(home, ".local", "bin", "one-shot-tally"))
 	for _, spec := range []codexHookSpec{
 		{event: "SessionStart", matcher: "startup|resume", command: shipCommand, timeout: 300, owned: isShipItHook},
-		// Stop may use the 1,800-second deploy-it contract and needs five
-		// minutes for delivery orchestration and the final hook result.
-		{event: "Stop", command: shipCommand, timeout: 2100, owned: isShipItHook},
+		// Delivery runs in the background with a bounded lifetime; it must
+		// never delay agent completion while Jenkins verifies the release.
+		{event: "Stop", command: shipCommand, timeout: 300, owned: isShipItHook},
 		// one-shot-tally records successful explicit edits in the shared touched
 		// root registry. ship-it reads that registry at Stop to deliver edited
 		// repositories outside the session's initial working directory.
+		// Async observers may complete out of order; a late touched-root
+		// update remains available to the next delivery invocation.
 		{event: "PreToolUse", matcher: "*", command: tallyCommand, timeout: 5, owned: exactCommand(tallyCommand)},
 		{event: "PostToolUse", matcher: "*", command: tallyCommand, timeout: 5, owned: exactCommand(tallyCommand)},
 	} {
@@ -82,7 +84,7 @@ func installCodexHooks(home string, out io.Writer) error {
 		if spec.matcher != "" {
 			group["matcher"] = spec.matcher
 		}
-		group["hooks"] = []any{map[string]any{"type": "command", "command": spec.command, "timeout": spec.timeout}}
+		group["hooks"] = []any{map[string]any{"type": "command", "command": spec.command, "timeout": spec.timeout, "async": true}}
 		hooks[spec.event] = append(kept, group)
 	}
 	data, err := json.MarshalIndent(file, "", "  ")

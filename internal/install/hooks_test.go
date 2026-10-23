@@ -43,12 +43,15 @@ func TestCodexHooksPreserveOtherHandlersAndInstallIdempotently(t *testing.T) {
 	if len(hooks["PreToolUse"].([]any)) != 2 || len(hooks["PostToolUse"].([]any)) != 1 || len(hooks["Stop"].([]any)) != 2 {
 		t.Fatal("unrelated hooks were lost or owned hooks duplicated")
 	}
-	for event, want := range map[string]float64{"SessionStart": 300, "Stop": 2100} {
+	for event, want := range map[string]float64{"SessionStart": 300, "Stop": 300} {
 		groups := hooks[event].([]any)
 		group := groups[len(groups)-1].(map[string]any)
 		handler := group["hooks"].([]any)[0].(map[string]any)
 		if handler["timeout"] != want {
 			t.Fatalf("%s timeout = %v", event, handler["timeout"])
+		}
+		if handler["async"] != true {
+			t.Fatalf("%s delivery must run without blocking the agent: %#v", event, handler)
 		}
 	}
 	start := hooks["SessionStart"].([]any)[0].(map[string]any)
@@ -64,6 +67,9 @@ func TestCodexHooksPreserveOtherHandlersAndInstallIdempotently(t *testing.T) {
 		handler := group["hooks"].([]any)[0].(map[string]any)
 		if handler["command"] != "'"+filepath.Join(home, ".local", "bin", "one-shot-tally")+"'" || handler["timeout"] != float64(5) {
 			t.Fatalf("%s observer = %#v", event, handler)
+		}
+		if handler["async"] != true {
+			t.Fatalf("%s observer must run without blocking the agent: %#v", event, handler)
 		}
 	}
 	if strings.Contains(string(first), "followup_message") {
@@ -92,8 +98,10 @@ func TestCodexHooksFollowExistingAccountLink(t *testing.T) {
 	if err := os.Symlink(canonicalPath, accountPath); err != nil {
 		t.Fatal(err)
 	}
-	if err := installCodexHooks(home, io.Discard); err != nil {
-		t.Fatal(err)
+	for range 2 {
+		if err := installCodexHooks(home, io.Discard); err != nil {
+			t.Fatal(err)
+		}
 	}
 	info, err := os.Lstat(accountPath)
 	if err != nil {
@@ -119,8 +127,11 @@ func TestCodexHooksFollowExistingAccountLink(t *testing.T) {
 	}
 	stop := hooks["Stop"].([]any)
 	handler := stop[len(stop)-1].(map[string]any)["hooks"].([]any)[0].(map[string]any)
-	if handler["timeout"] != float64(2100) {
+	if handler["timeout"] != float64(300) {
 		t.Fatalf("Stop timeout = %v", handler["timeout"])
+	}
+	if handler["async"] != true {
+		t.Fatalf("account Stop must run without blocking the agent: %#v", handler)
 	}
 }
 
