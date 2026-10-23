@@ -34,7 +34,17 @@ func Run(args []string, version string, out, errOut io.Writer) error {
 	return RunInput(args, version, nil, out, errOut)
 }
 
+// RunInput queues lifecycle work independently of the hook runner's pipes and
+// process group. Explicit CLI commands remain synchronous.
 func RunInput(args []string, version string, in io.Reader, out, errOut io.Writer) error {
+	if len(args) == 0 && in != nil && os.Getenv(backgroundWorkerEnv) != "1" {
+		return runLegacyHook(in, out, errOut)
+	}
+	return runInput(args, version, in, out, errOut)
+}
+
+// runInput executes the worker and explicit commands to their final result.
+func runInput(args []string, version string, in io.Reader, out, errOut io.Writer) error {
 	if len(args) == 0 {
 		background := os.Getenv(backgroundWorkerEnv) == "1"
 		if background {
@@ -202,9 +212,6 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 				combined.SystemMessage += "\n\n"
 			}
 			combined.SystemMessage += report.SystemMessage
-			if report.Decision == "block" {
-				combined.Decision, combined.Reason = report.Decision, report.Reason
-			}
 		}
 		response, _ = json.Marshal(combined)
 		if err != nil && allFailuresReported && !background {

@@ -64,7 +64,7 @@ func TestHookTargetsPayloadRepositoriesAndSkipsBeforeGit(t *testing.T) {
 
 	var codexOut, codexErr bytes.Buffer
 	codexPayload := fmt.Sprintf(`{"hook_event_name":"Stop","status":"completed","cwd":%q}`, firstWork)
-	if err := RunInput(nil, "test", strings.NewReader(codexPayload), &codexOut, &codexErr); err != nil {
+	if err := runInput(nil, "test", strings.NewReader(codexPayload), &codexOut, &codexErr); err != nil {
 		t.Fatalf("Codex Stop: %v\n%s", err, codexErr.String())
 	}
 	if codexOut.String() != "{}\n" || codexErr.String() != "" {
@@ -77,7 +77,7 @@ func TestHookTargetsPayloadRepositoriesAndSkipsBeforeGit(t *testing.T) {
 	var cursorOut, cursorErr bytes.Buffer
 	cursorPayload := fmt.Sprintf(`{"hook_event_name":"stop","status":"completed","cwd":%q,"workspace_roots":[%q,%q,%q]}`,
 		outside, firstWork, filepath.Join(firstWork, "nested"), secondWork)
-	if err := RunInput(nil, "test", strings.NewReader(cursorPayload), &cursorOut, &cursorErr); err != nil {
+	if err := runInput(nil, "test", strings.NewReader(cursorPayload), &cursorOut, &cursorErr); err != nil {
 		t.Fatalf("Cursor Stop: %v\n%s", err, cursorErr.String())
 	}
 	if cursorOut.String() != "{}\n" || cursorErr.String() != "" {
@@ -110,7 +110,7 @@ func TestHookSkipsIrrelevantAndMalformedPayloadBeforeGit(t *testing.T) {
 		`{"hook_event_name":"Stop"`,
 	} {
 		var out, errOut bytes.Buffer
-		if err := RunInput(nil, "test", strings.NewReader(payload), &out, &errOut); err != nil {
+		if err := runInput(nil, "test", strings.NewReader(payload), &out, &errOut); err != nil {
 			t.Fatalf("%s: %v", payload, err)
 		}
 		if out.String() != "{}\n" || errOut.String() != "" {
@@ -139,7 +139,7 @@ func TestHookWritesGitFailureToStderr(t *testing.T) {
 
 	var out, errOut bytes.Buffer
 	payload := fmt.Sprintf(`{"hook_event_name":"Stop","cwd":%q}`, outside)
-	err = RunInput(nil, "test", strings.NewReader(payload), &out, &errOut)
+	err = runInput(nil, "test", strings.NewReader(payload), &out, &errOut)
 	if err == nil || !strings.Contains(err.Error(), "not inside a Git repository") {
 		t.Fatalf("error = %v", err)
 	}
@@ -220,7 +220,7 @@ func TestBareLifecyclePullsThenShipsCompletedCycles(t *testing.T) {
 
 	write(t, filepath.Join(work, "next.txt"), "unfinished\n")
 	var hookOutput bytes.Buffer
-	if err := RunInput(nil, "test", strings.NewReader(`{"hook_event_name":"SessionStart"}`), &hookOutput, &hookOutput); err != nil {
+	if err := runInput(nil, "test", strings.NewReader(`{"hook_event_name":"SessionStart"}`), &hookOutput, &hookOutput); err != nil {
 		t.Fatal(err)
 	}
 	if hookOutput.String() != "{}\n" {
@@ -230,7 +230,7 @@ func TestBareLifecyclePullsThenShipsCompletedCycles(t *testing.T) {
 		t.Fatal("SessionStart shipped unfinished work")
 	}
 	hookOutput.Reset()
-	if err := RunInput(nil, "test", strings.NewReader(`{"hook_event_name":"Stop"}`), &hookOutput, &hookOutput); err != nil {
+	if err := runInput(nil, "test", strings.NewReader(`{"hook_event_name":"Stop"}`), &hookOutput, &hookOutput); err != nil {
 		t.Fatalf("Stop: %v\n%s", err, output.String())
 	}
 	if hookOutput.String() != "{}\n" {

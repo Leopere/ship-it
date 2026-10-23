@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,27 +10,18 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/Leopere/ship-it/internal/workday"
 )
 
 const backgroundWorkerEnv = "SHIP_IT_BACKGROUND_WORKER"
 
-// Old sessions retain a five-second Stop handler. Keep its original quick
-// handoff behavior while the installed no-argument command owns delivery.
+// Native lifecycle calls and cached legacy handlers share the same detached
+// worker. Hook cancellation cannot terminate delivery or its final log record.
 func runLegacyHook(in io.Reader, out, errOut io.Writer) error {
 	event, ok := decodeHookEvent(in)
-	mode, run := lifecycleMode(event)
+	_, run := lifecycleMode(event)
 	if !ok || !run {
 		fmt.Fprintln(out, "{}")
 		return nil
-	}
-	if mode != workday.Stop {
-		data, err := json.Marshal(event)
-		if err != nil {
-			return err
-		}
-		return runCycle(bytes.NewReader(data), out, errOut, false)
 	}
 
 	// Resolve a missing cwd before detaching. Retain only the fields used by
@@ -75,6 +65,7 @@ func runLegacyHook(in io.Reader, out, errOut io.Writer) error {
 		writeHookRecord(log, "completed", event, err)
 		return fmt.Errorf("start delivery worker (log: %s): %w", log.Name(), err)
 	}
+	_ = json.NewEncoder(log).Encode(map[string]any{"ship_it": "worker", "pid": cmd.Process.Pid})
 	if err := cmd.Process.Release(); err != nil {
 		return fmt.Errorf("release delivery worker (log: %s): %w", log.Name(), err)
 	}

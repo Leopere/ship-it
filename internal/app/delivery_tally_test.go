@@ -80,9 +80,15 @@ func TestTallyDeliveryValidationAndScope(t *testing.T) {
 			if err := os.Chmod(filepath.Join(bin, "one-shot-tally"), 0o755); err != nil {
 				t.Fatal(err)
 			}
-			_, err := tallyDelivery(event, root, nil)
+			output, err := tallyDelivery(event, root, nil)
 			if (err != nil) != test.wantErr {
 				t.Fatalf("error = %v, want error %v", err, test.wantErr)
+			}
+			if err == nil && (strings.Contains(string(output), `"decision"`) || strings.Contains(string(output), `"reason"`)) {
+				t.Fatalf("reporter must only provide advisory feedback: %s", output)
+			}
+			if test.name == "valid block" && !strings.Contains(string(output), "why") {
+				t.Fatalf("recovery advice was lost: %s", output)
 			}
 		})
 	}

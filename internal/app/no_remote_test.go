@@ -36,7 +36,7 @@ func TestHooksSkipLocalOnlyRepositoriesWithoutDelivery(t *testing.T) {
 				}
 				var output, diagnostics bytes.Buffer
 				payload := fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q,"session_id":"local-only","turn_id":"turn"}`, event, repo)
-				if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
+				if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
 					t.Fatalf("local-only hook failed: %v\n%s", err, diagnostics.String())
 				}
 				var response deliveryTallyResult
@@ -91,7 +91,7 @@ func TestConfiguredBrokenRemoteStillFailsHooks(t *testing.T) {
 			runGit(t, repo, "remote", "add", "origin", filepath.Join(repo, "missing.git"))
 			var output, diagnostics bytes.Buffer
 			payload := fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q}`, event, repo)
-			err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics)
+			err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics)
 			if err == nil || !strings.Contains(err.Error(), "ls-remote") {
 				t.Fatalf("configured remote failure suppressed: %v", err)
 			}
@@ -109,7 +109,7 @@ func TestCorruptGitConfigurationStillFailsHook(t *testing.T) {
 	write(t, filepath.Join(repo, ".git", "config"), "[broken\n")
 	var output, diagnostics bytes.Buffer
 	payload := fmt.Sprintf(`{"hook_event_name":"SessionStart","cwd":%q}`, repo)
-	if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil {
+	if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil {
 		t.Fatal("corrupt configuration treated as no remote")
 	}
 	if strings.Contains(output.String(), "Delivery skipped") {
@@ -128,7 +128,7 @@ func TestSkippedRootDoesNotHideOtherRepositoryFailure(t *testing.T) {
 			runGit(t, broken, "remote", "add", "origin", filepath.Join(broken, "missing.git"))
 			var output, diagnostics bytes.Buffer
 			payload := fmt.Sprintf(`{"hook_event_name":%q,"workspace_roots":[%q,%q]}`, event, local, broken)
-			if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil || !strings.Contains(err.Error(), "ls-remote") {
+			if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil || !strings.Contains(err.Error(), "ls-remote") {
 				t.Fatalf("skip report hid other remote failure: %v", err)
 			}
 			if !strings.Contains(output.String(), "Delivery skipped") || !strings.Contains(diagnostics.String(), `"ship_it":"failed"`) {

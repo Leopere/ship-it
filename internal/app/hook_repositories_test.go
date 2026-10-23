@@ -20,7 +20,7 @@ func TestImplicitHooksIgnoreGeneratedSourceWithoutRepository(t *testing.T) {
 		t.Run(event, func(t *testing.T) {
 			var output, diagnostics bytes.Buffer
 			payload := fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q,"session_id":"snapshot","turn_id":"turn"}`, event, snapshot)
-			if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
+			if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
 				t.Fatalf("ordinary source snapshot became delivery failure: %v", err)
 			}
 			if output.String() != "{}\n" || diagnostics.Len() != 0 {
@@ -72,7 +72,7 @@ func TestNonRepositoryHookPreservesWorkspaceAndTouchedDelivery(t *testing.T) {
 	outside := testDir(t)
 	payload := fmt.Sprintf(`{"hook_event_name":"Stop","session_id":"mixed","turn_id":"turn","cwd":%q,"workspace_roots":[%q,%q]}`, outside, outside, nested)
 	var output, diagnostics bytes.Buffer
-	if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err != nil {
 		t.Fatalf("mixed Stop: %v\n%s", err, diagnostics.String())
 	}
 	if got := gitOutput(t, workspaceRemote, "show", "main:workspace.txt"); got != "workspace work\n" {
@@ -96,7 +96,7 @@ func TestRepositoryMarkerKeepsMissingGitFailure(t *testing.T) {
 	t.Setenv("PATH", testDir(t))
 	var output, diagnostics bytes.Buffer
 	payload := fmt.Sprintf(`{"hook_event_name":"SessionStart","cwd":%q}`, repo)
-	if err := RunInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil || !strings.Contains(err.Error(), "not inside a Git repository") {
+	if err := runInput(nil, "test", strings.NewReader(payload), &output, &diagnostics); err == nil || !strings.Contains(err.Error(), "not inside a Git repository") {
 		t.Fatalf("missing Git failure was suppressed: %v", err)
 	}
 }

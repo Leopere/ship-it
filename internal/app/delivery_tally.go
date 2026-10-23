@@ -136,5 +136,11 @@ func validateTallyOutput(raw []byte) ([]byte, error) {
 	if result.Decision == "block" && strings.TrimSpace(result.Reason) == "" {
 		return nil, errors.New("one-shot-tally reporter returned block without reason")
 	}
+	// Older reporters may request another turn. Preserve the diagnostic as
+	// feedback, but lifecycle delivery must never control conversation flow.
+	if result.Reason != "" && !strings.Contains(result.SystemMessage, result.Reason) {
+		result.SystemMessage += "\n" + result.Reason
+	}
+	result.Decision, result.Reason = "", ""
 	return json.Marshal(result)
 }

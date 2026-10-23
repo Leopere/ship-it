@@ -57,6 +57,47 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 		}
 	})
 
+	for _, event := range []string{"Stop", "SessionStart"} {
+		t.Run("native "+event+" survives runner cancellation", func(t *testing.T) {
+			remote, work := newRepository(t, root, "native-"+event)
+			write(t, filepath.Join(work, "change.txt"), "native delivery\n")
+			write(t, filepath.Join(work, ".deploy-it.json"), "{}\n")
+			installDeployStub(t, binDir, filepath.Join(root, "native-deploy.out"), "native live acceptance\n", 2*time.Second, 0)
+			// A slow Git operation proves SessionStart also leaves the hook
+			// process group before doing its daily pull.
+			hook := filepath.Join(work, ".git", "hooks", "post-merge")
+			write(t, hook, "#!/bin/sh\nsleep 2\n")
+			if err := os.Chmod(hook, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			payload := fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q}`, event, work)
+			out, elapsed, pgid := invokeBinary(t, shipIt, baseEnv, "", payload)
+			var response map[string]string
+			if err := json.Unmarshal([]byte(out), &response); err != nil {
+				t.Fatal(err)
+			}
+			message := response["systemMessage"]
+			idx := strings.LastIndex(message, " in ")
+			if idx < 0 || elapsed >= time.Second {
+				t.Fatalf("native handoff: %s (%s)", out, elapsed)
+			}
+			logPath := message[idx+len(" in "):]
+			killProcessGroup(t, pgid)
+			log := waitForHookState(t, logPath, "completed", 10*time.Second)
+			if !strings.Contains(log, `"pid":`) {
+				t.Fatalf("worker handle missing: %s", log)
+			}
+			_, err := exec.Command("git", "-C", remote, "show", "main:change.txt").Output()
+			if event == "Stop" && err != nil {
+				t.Fatal("native Stop did not push")
+			}
+			if event == "SessionStart" && err == nil {
+				t.Fatal("SessionStart shipped unfinished work")
+			}
+			assertPrivateLog(t, logPath)
+		})
+	}
+
 	t.Run("success survives old deadline and deploys", func(t *testing.T) {
 		remote, work := newRepository(t, root, "success")
 		write(t, filepath.Join(work, ".deploy-it.json"), "{}\n")
@@ -215,7 +256,11 @@ func invokeBinary(t *testing.T, binary string, env []string, arg, payload string
 	outPath := filepath.Join(root, "launcher.out")
 	donePath := filepath.Join(root, "launcher.done")
 	wrapper := filepath.Join(root, "launcher.sh")
-	write(t, wrapper, "#!/bin/sh\n"+shellQuote(binary)+" "+shellQuote(arg)+" >"+shellQuote(outPath)+" 2>&1\nprintf done >"+shellQuote(donePath)+"\nsleep 30\n")
+	argument := ""
+	if arg != "" {
+		argument = " " + shellQuote(arg)
+	}
+	write(t, wrapper, "#!/bin/sh\n"+shellQuote(binary)+argument+" >"+shellQuote(outPath)+" 2>&1\nprintf done >"+shellQuote(donePath)+"\nsleep 30\n")
 	if err := os.Chmod(wrapper, 0o755); err != nil {
 		t.Fatal(err)
 	}

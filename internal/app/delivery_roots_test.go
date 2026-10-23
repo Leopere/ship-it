@@ -27,7 +27,7 @@ func TestStopDeliversTouchedExternalRepositoryOnce(t *testing.T) {
 
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(alias) + `}`
 	var output, diagnostics bytes.Buffer
-	if err := RunInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
 		t.Fatalf("Stop: %v\n%s", err, diagnostics.String())
 	}
 	if got := gitOutput(t, externalRemote, "show", "main:external.txt"); got != "changed\n" {
@@ -44,7 +44,7 @@ func TestStopDeliversTouchedExternalRepositoryOnce(t *testing.T) {
 	continuation := `{"hook_event_name":"Stop","status":"completed","stop_hook_active":true,"session_id":"session","turn_id":"turn","cwd":` + jsonQuote(alias) + `}`
 	output.Reset()
 	diagnostics.Reset()
-	if err := RunInput(nil, "test", bytes.NewBufferString(continuation), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", bytes.NewBufferString(continuation), &output, &diagnostics); err != nil {
 		t.Fatalf("clean continuation: %v\n%s", err, diagnostics.String())
 	}
 	if after := gitOutput(t, externalRemote, "rev-list", "--count", "main"); after != before {
@@ -68,7 +68,7 @@ func TestTouchedDeliveryKeepsFailedAndNewerGenerations(t *testing.T) {
 	installTallyStub(t)
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(testDir(t)) + `}`
 	var output, diagnostics bytes.Buffer
-	_ = RunInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics)
+	_ = runInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics)
 	registry, err := touchedRootRegistry("session")
 	if err != nil || registry.Roots[canonicalFailed] != 1 {
 		t.Fatalf("failed delivery was cleared: registry=%#v err=%v", registry, err)
@@ -127,7 +127,7 @@ func TestSessionStartDoesNotSelectTouchedRoots(t *testing.T) {
 
 	payload := `{"hook_event_name":"SessionStart","session_id":"session","cwd":` + jsonQuote(readOnly) + `}`
 	var output, diagnostics bytes.Buffer
-	if err := RunInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
 		t.Fatalf("SessionStart: %v\n%s", err, diagnostics.String())
 	}
 	if _, err := os.Stat(filepath.Join(external, "latest.txt")); !os.IsNotExist(err) {
@@ -191,7 +191,7 @@ func TestCleanFailedDeploymentRemainsPendingForNextTurn(t *testing.T) {
 	t.Setenv("PATH", bin+":"+os.Getenv("PATH"))
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(repo) + `}`
 	var output, diagnostics bytes.Buffer
-	if err := RunInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
 		t.Fatalf("failed deployment Stop: %v\n%s", err, diagnostics.String())
 	}
 	if output, err := gitCommand(repo, "status", "--porcelain"); err != nil || output != "" {
@@ -374,7 +374,7 @@ func TestFailedSnapshotPreservesConcurrentEditAndGeneration(t *testing.T) {
 	t.Setenv("PATH", bin+":"+os.Getenv("PATH"))
 	payload := `{"hook_event_name":"Stop","status":"completed","session_id":"session","turn_id":"turn","cwd":` + jsonQuote(repo) + `}`
 	var output, diagnostics bytes.Buffer
-	if err := RunInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
+	if err := runInput(nil, "test", bytes.NewBufferString(payload), &output, &diagnostics); err != nil {
 		t.Fatalf("Stop: %v\n%s", err, diagnostics.String())
 	}
 	registry, err := touchedRootRegistry("session")
@@ -469,7 +469,7 @@ func TestExplicitFailureWithoutTouchedGenerationRetriesOnlyChangedContents(t *te
 			t.Fatal(err)
 		}
 		var output, diagnostics bytes.Buffer
-		if err := RunInput(nil, "test", bytes.NewReader(payload), &output, &diagnostics); err != nil {
+		if err := runInput(nil, "test", bytes.NewReader(payload), &output, &diagnostics); err != nil {
 			t.Fatalf("Stop: %v\n%s", err, diagnostics.String())
 		}
 	}
