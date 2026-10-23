@@ -138,7 +138,10 @@ func (r *Repo) Publish() (func() error, error) {
 		if err != nil {
 			return fmt.Errorf("Git push succeeded; find deploy-it: %w", err)
 		}
-		cmd := exec.Command(deployIt, "--commit", pushedCommit, "--branch", destination.Branch, "--remote", destination.Remote)
+		// Lifecycle execution already runs in a detached ship-it worker.
+		// Observe deploy-it's durable operation to its final command result;
+		// enqueue success alone must never clear pending delivery or tally it.
+		cmd := exec.Command(deployIt, "--commit", pushedCommit, "--branch", destination.Branch, "--remote", destination.Remote, "--wait")
 		cmd.Dir = r.Root
 		cmd.Stdout, cmd.Stderr = r.Out, r.Err
 		if err := cmd.Run(); err != nil {

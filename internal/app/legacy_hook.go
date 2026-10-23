@@ -10,6 +10,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/Leopere/ship-it/internal/workday"
 )
 
 const backgroundWorkerEnv = "SHIP_IT_BACKGROUND_WORKER"
@@ -18,8 +20,23 @@ const backgroundWorkerEnv = "SHIP_IT_BACKGROUND_WORKER"
 // worker. Hook cancellation cannot terminate delivery or its final log record.
 func runLegacyHook(in io.Reader, out, errOut io.Writer) error {
 	event, ok := decodeHookEvent(in)
-	_, run := lifecycleMode(event)
+	mode, run := lifecycleMode(event)
 	if !ok || !run {
+		fmt.Fprintln(out, "{}")
+		return nil
+	}
+
+	// Preserve no-op behavior for non-repository hooks, including the installed
+	// binary's Jenkins acceptance probe. Touched roots still select delivery
+	// when the session's initial directory is outside a repository.
+	roots := hookRoots(event)
+	if mode == workday.Stop {
+		roots = append(roots, mapRoots(touchedDeliveryRoots(event.SessionID))...)
+		if event.StopHookActive {
+			roots = continuationRoots(event)
+		}
+	}
+	if len(repositoryHookRoots(roots)) == 0 {
 		fmt.Fprintln(out, "{}")
 		return nil
 	}

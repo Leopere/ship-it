@@ -36,6 +36,21 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 		"PATH="+binDir+string(os.PathListSeparator)+os.Getenv("PATH"),
 	)
 
+	for _, event := range []string{"SessionStart", "Stop"} {
+		t.Run("native non-repository "+event, func(t *testing.T) {
+			cmd := exec.Command(shipIt)
+			cmd.Dir, cmd.Env = root, baseEnv
+			cmd.Stdin = strings.NewReader(fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q}`, event, root))
+			out, err := cmd.CombinedOutput()
+			if err != nil || strings.TrimSpace(string(out)) != "{}" {
+				t.Fatalf("no-op hook: %s, %v", out, err)
+			}
+			if logs := hookLogs(t, home); len(logs) != 0 {
+				t.Fatalf("no-op queued work: %v", logs)
+			}
+		})
+	}
+
 	t.Run("empty pipe ships and malformed input does not", func(t *testing.T) {
 		remote, work := newRepository(t, root, "empty-stdin")
 		write(t, filepath.Join(work, "change.txt"), "empty pipe delivery\n")
@@ -63,13 +78,19 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 			write(t, filepath.Join(work, "change.txt"), "native delivery\n")
 			write(t, filepath.Join(work, ".deploy-it.json"), "{}\n")
 			installDeployStub(t, binDir, filepath.Join(root, "native-deploy.out"), "native live acceptance\n", 2*time.Second, 0)
-			// A slow Git operation proves SessionStart also leaves the hook
-			// process group before doing its daily pull.
-			hook := filepath.Join(work, ".git", "hooks", "post-merge")
-			write(t, hook, "#!/bin/sh\nsleep 2\n")
-			if err := os.Chmod(hook, 0o755); err != nil {
+			// Delay the actual pull in a controlled Git wrapper so the launcher
+			// is cancelled while SessionStart still has active work.
+			gitPath, err := exec.LookPath("git")
+			if err != nil {
 				t.Fatal(err)
 			}
+			gitWrapper := filepath.Join(binDir, "git")
+			pullStarted := filepath.Join(root, "pull-started-"+event)
+			write(t, gitWrapper, "#!/bin/sh\nif [ \"$3\" = pull ]; then touch "+shellQuote(pullStarted)+"; sleep 2; fi\nexec "+shellQuote(gitPath)+" \"$@\"\n")
+			if err := os.Chmod(gitWrapper, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			defer os.Remove(gitWrapper)
 			payload := fmt.Sprintf(`{"hook_event_name":%q,"cwd":%q}`, event, work)
 			out, elapsed, pgid := invokeBinary(t, shipIt, baseEnv, "", payload)
 			var response map[string]string
@@ -82,12 +103,22 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 				t.Fatalf("native handoff: %s (%s)", out, elapsed)
 			}
 			logPath := message[idx+len(" in "):]
+			deadline := time.Now().Add(3 * time.Second)
+			for {
+				if _, err := os.Stat(pullStarted); err == nil {
+					break
+				}
+				if time.Now().After(deadline) {
+					t.Fatal("worker never started pull")
+				}
+				time.Sleep(20 * time.Millisecond)
+			}
 			killProcessGroup(t, pgid)
 			log := waitForHookState(t, logPath, "completed", 10*time.Second)
 			if !strings.Contains(log, `"pid":`) {
 				t.Fatalf("worker handle missing: %s", log)
 			}
-			_, err := exec.Command("git", "-C", remote, "show", "main:change.txt").Output()
+			_, err = exec.Command("git", "-C", remote, "show", "main:change.txt").Output()
 			if event == "Stop" && err != nil {
 				t.Fatal("native Stop did not push")
 			}
@@ -181,9 +212,12 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 			}
 		})
 	}
+	t.Run("non-repository workspace root", func(t *testing.T) {
+		testLegacyHookIgnoresNonRepositoryWorkspaceRoot(t, shipIt)
+	})
 }
 
-func TestLegacyHookIgnoresNonRepositoryWorkspaceRoot(t *testing.T) {
+func testLegacyHookIgnoresNonRepositoryWorkspaceRoot(t *testing.T, binary string) {
 	root := testDir(t)
 	remote, work := newRepository(t, root, "multi-root")
 	write(t, filepath.Join(work, "change.txt"), "continued\n")
@@ -191,13 +225,6 @@ func TestLegacyHookIgnoresNonRepositoryWorkspaceRoot(t *testing.T) {
 	binDir := filepath.Join(root, "bin")
 	if err := os.MkdirAll(binDir, 0o755); err != nil {
 		t.Fatal(err)
-	}
-	binary := filepath.Join(root, "ship-it")
-	build := exec.Command("go", "build", "-work", "-o", binary, "./cmd/ship-it")
-	build.Dir = repoRoot(t)
-	build.Env = append(os.Environ(), "GIT_CONFIG_GLOBAL=/dev/null", "GIT_CONFIG_SYSTEM=/dev/null")
-	if output, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build ship-it: %v\n%s", err, output)
 	}
 	env := append(os.Environ(),
 		"HOME="+home,

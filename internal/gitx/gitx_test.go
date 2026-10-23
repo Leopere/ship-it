@@ -89,7 +89,7 @@ func TestPullThenShipBootstrapsEmptyRepository(t *testing.T) {
 		t.Fatalf("published content = %q", got)
 	}
 	commit := strings.TrimSpace(outputGit(t, remote, "rev-parse", "main"))
-	if got := read(t, record); got != "--commit\n"+commit+"\n--branch\nmain\n--remote\norigin\n" {
+	if got := read(t, record); got != "--commit\n"+commit+"\n--branch\nmain\n--remote\norigin\n--wait\n" {
 		t.Fatalf("deployment arguments = %q", got)
 	}
 	if err := repo.Pull(); err != nil {
@@ -296,7 +296,7 @@ func TestShipHandsOffOnlyAfterSuccessfulPush(t *testing.T) {
 				return
 			}
 			pushedCommit := strings.TrimSpace(outputGit(t, f.remote, "rev-parse", "main"))
-			want := "--commit\n" + pushedCommit + "\n--branch\nmain\n--remote\norigin\n"
+			want := "--commit\n" + pushedCommit + "\n--branch\nmain\n--remote\norigin\n--wait\n"
 			if readErr != nil || string(data) != want {
 				t.Fatalf("deployment arguments = %q, error = %v", data, readErr)
 			}
@@ -498,7 +498,7 @@ func TestPublishCapturesDeploymentBeforeHeadAndDestinationChange(t *testing.T) {
 	if err := deploy(); err != nil {
 		t.Fatal(err)
 	}
-	want := "--commit\n" + commit + "\n--branch\nmain\n--remote\norigin\n"
+	want := "--commit\n" + commit + "\n--branch\nmain\n--remote\norigin\n--wait\n"
 	if got := read(t, record); got != want {
 		t.Fatalf("captured deployment = %q, want %q", got, want)
 	}
