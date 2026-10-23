@@ -28,6 +28,8 @@ Usage:
   ship-it skill
 `
 
+var errNoRemotes = errors.New("no Git remote is configured")
+
 func Run(args []string, version string, out, errOut io.Writer) error {
 	return RunInput(args, version, nil, out, errOut)
 }
@@ -90,6 +92,13 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 			return fmt.Errorf("consume delivery retry: %w", err)
 		}
 	}
+	// Hook events also originate in generated source snapshots and ordinary
+	// folders. Those have no delivery lifecycle; explicit invocations still
+	// diagnose a non-repository as an error. Keep actual repository failures.
+	roots = repositoryHookRoots(roots)
+	if len(roots) == 0 {
+		return nil
+	}
 	// Keep command output on disk as it arrives. An outer hook timeout can
 	// terminate this process before an in-memory diagnostic buffer is copied.
 	var diagnostics bytes.Buffer
@@ -119,9 +128,14 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 		}
 	}
 	allFailuresReported := true
-	var observe func(string, *gitx.Repo, error)
-	if mode == workday.Stop && event.SessionID != "" && event.TurnID != "" {
-		observe = func(root string, repo *gitx.Repo, deliveryErr error) {
+	observe := func(root string, repo *gitx.Repo, deliveryErr error) {
+		if errors.Is(deliveryErr, errNoRemotes) {
+			message := fmt.Sprintf("Delivery skipped for %s: no Git remote is configured. Work remains local; nothing was committed, pushed or deployed. Configure the intended remote to enable delivery.", root)
+			reports = append(reports, deliveryTallyResult{SystemMessage: message})
+			writeHookRecord(destination, "skipped", hookEvent{Name: event.Name, CWD: root}, nil)
+			return
+		}
+		if mode == workday.Stop && event.SessionID != "" && event.TurnID != "" {
 			if deliveryErr != nil {
 				failedRoots = append(failedRoots, root)
 				snapshot, attempted := attemptedSnapshots[root]
@@ -162,6 +176,10 @@ func runCycle(in io.Reader, out, errOut io.Writer, background bool) error {
 				report.SystemMessage += fmt.Sprintf("\nDelivery error for %s: %v. Diagnostic log: %s", root, deliveryErr, logPath)
 			}
 			reports = append(reports, report)
+		} else if deliveryErr != nil {
+			// A skip report for another root must not hide an unreported
+			// failure from SessionStart or a hook without tally metadata.
+			allFailuresReported = false
 		}
 	}
 	err := runRepositoriesObserved(roots, mode, destination, destination, before, observe)
@@ -321,6 +339,21 @@ func runRepositoriesObserved(roots []string, mode workday.Mode, out, errOut io.W
 			continue
 		}
 		seen[canonicalRoot] = struct{}{}
+		hasRemotes, err := repo.HasRemotes()
+		if err != nil {
+			failures = append(failures, fmt.Errorf("%s: %w", root, err))
+			if observe != nil {
+				observe(canonicalRoot, repo, err)
+			}
+			continue
+		}
+		if !hasRemotes {
+			fmt.Fprintf(out, "ship-it: delivery skipped for %s: %v; work remains local\n", canonicalRoot, errNoRemotes)
+			if observe != nil {
+				observe(canonicalRoot, repo, errNoRemotes)
+			}
+			continue
+		}
 		if before != nil {
 			before(canonicalRoot)
 		}

@@ -142,7 +142,7 @@ func TestLegacyHookDetachedDelivery(t *testing.T) {
 	}
 }
 
-func TestLegacyHookContinuesAfterInvalidWorkspaceRoot(t *testing.T) {
+func TestLegacyHookIgnoresNonRepositoryWorkspaceRoot(t *testing.T) {
 	root := testDir(t)
 	remote, work := newRepository(t, root, "multi-root")
 	write(t, filepath.Join(work, "change.txt"), "continued\n")
@@ -180,12 +180,12 @@ func TestLegacyHookContinuesAfterInvalidWorkspaceRoot(t *testing.T) {
 	}
 	logPath := strings.TrimSpace(message[idx+len(" in "):])
 	waitForHookState(t, logPath, "queued", 3*time.Second)
-	waitForHookState(t, logPath, "failed", 8*time.Second)
+	waitForHookState(t, logPath, "completed", 8*time.Second)
 	killProcessGroup(t, pgid)
 	logBytes, _ := os.ReadFile(logPath)
 	log := string(logBytes)
-	if !strings.Contains(log, "not inside a Git repository") {
-		t.Fatalf("missing invalid-root diagnostic:\n%s", log)
+	if strings.Contains(log, "not inside a Git repository") || strings.Contains(log, `"ship_it":"failed"`) {
+		t.Fatalf("ordinary workspace produced a delivery failure:\n%s", log)
 	}
 	if got := strings.TrimSpace(gitOutput(t, remote, "show", "main:change.txt")); got != "continued" {
 		t.Fatalf("valid root was not delivered after invalid root: %q", got)

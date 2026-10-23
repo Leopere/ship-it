@@ -37,6 +37,16 @@ func Open(cwd string, out, errOut io.Writer) (*Repo, error) {
 	return &Repo{Root: strings.TrimSpace(stdout.String()), Out: out, Err: errOut}, nil
 }
 
+// HasRemotes distinguishes a local-only repository from a configured remote
+// whose configuration or access is broken. Git errors must remain errors.
+func (r *Repo) HasRemotes() (bool, error) {
+	remotes, err := r.output("remote")
+	if err != nil {
+		return false, err
+	}
+	return strings.TrimSpace(remotes) != "", nil
+}
+
 func (r *Repo) Pull() error {
 	if _, err := r.output("rev-parse", "--verify", "HEAD^{commit}"); err != nil {
 		branch, err := r.output("symbolic-ref", "--quiet", "--short", "HEAD")

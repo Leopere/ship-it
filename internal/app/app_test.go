@@ -125,6 +125,9 @@ func TestHookWritesGitFailureToStderr(t *testing.T) {
 	if err := os.Mkdir(outside, 0o755); err != nil {
 		t.Fatal(err)
 	}
+	// A broken worktree marker is a real repository failure. Ordinary folders
+	// without a marker are not implicit hook delivery targets.
+	write(t, filepath.Join(outside, ".git"), "gitdir: missing-worktree\n")
 	previous, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -143,7 +146,7 @@ func TestHookWritesGitFailureToStderr(t *testing.T) {
 	if out.String() != "{}\n" {
 		t.Fatalf("stdout = %q", out.String())
 	}
-	want := "fatal: not a git repository (or any of the parent directories): .git\n"
+	want := "fatal: not a git repository:"
 	if !strings.Contains(errOut.String(), want) || !strings.Contains(errOut.String(), `"ship_it":"failed"`) {
 		t.Fatalf("stderr = %q, want %q", errOut.String(), want)
 	}

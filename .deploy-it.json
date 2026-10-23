@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "after_ship": true,
+  "environment": "local-mac",
+  "command": ["/opt/homebrew/bin/python3", "scripts/jenkins-delivery.py"],
+  "env": ["HOME"],
+  "timeout_seconds": 300
+}
