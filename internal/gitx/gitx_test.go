@@ -110,6 +110,103 @@ func TestInitialPullDoesNotHideInaccessibleRemote(t *testing.T) {
 	}
 }
 
+func TestPullThenShipBootstrapsExistingHistoryToEmptyRemote(t *testing.T) {
+	t.Setenv("GIT_CONFIG_GLOBAL", "/dev/null")
+	t.Setenv("GIT_CONFIG_SYSTEM", "/dev/null")
+	f := newFixture(t)
+	remote := filepath.Join(testDir(t), "private.git")
+	runGit(t, f.work, "init", "--bare", remote)
+	runGit(t, f.work, "remote", "rename", "origin", "upstream")
+	runGit(t, f.work, "remote", "add", "origin", remote)
+	runGit(t, f.work, "config", "branch.main.remote", "origin")
+	runGit(t, f.work, "config", "branch.main.merge", "refs/heads/main")
+	inherited := strings.TrimSpace(outputGit(t, f.work, "rev-parse", "HEAD"))
+	write(t, filepath.Join(f.work, "private-change.txt"), "first private publication\n")
+	var output bytes.Buffer
+	repo, err := Open(f.work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("initial pull with inherited history: %v\n%s", err, output.String())
+	}
+	if got := read(t, filepath.Join(f.work, "private-change.txt")); got != "first private publication\n" {
+		t.Fatalf("pending content = %q", got)
+	}
+	if err := repo.Ship(); err != nil {
+		t.Fatalf("initial private publication: %v\n%s", err, output.String())
+	}
+	runGit(t, remote, "merge-base", "--is-ancestor", inherited, "main")
+	if got := outputGit(t, remote, "show", "main:private-change.txt"); got != "first private publication\n" {
+		t.Fatalf("private content = %q", got)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("subsequent private pull: %v\n%s", err, output.String())
+	}
+}
+
+func TestExistingHistoryPullDoesNotHideInaccessibleRemote(t *testing.T) {
+	f := newFixture(t)
+	runGit(t, f.work, "remote", "rename", "origin", "upstream")
+	runGit(t, f.work, "remote", "add", "origin", filepath.Join(testDir(t), "missing.git"))
+	runGit(t, f.work, "config", "branch.main.remote", "origin")
+	runGit(t, f.work, "config", "branch.main.merge", "refs/heads/main")
+	repo, err := Open(f.work, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err == nil {
+		t.Fatal("initial pull with inherited history ignored inaccessible remote")
+	}
+}
+
+func TestPullDoesNotTreatMissingBranchOnNonemptyRemoteAsBootstrap(t *testing.T) {
+	f := newFixture(t)
+	runGit(t, f.work, "config", "branch.main.merge", "refs/heads/missing")
+	var output bytes.Buffer
+	repo, err := Open(f.work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err == nil {
+		t.Fatal("pull ignored a missing selected branch on a nonempty remote")
+	}
+	if !strings.Contains(output.String(), "missing") {
+		t.Fatalf("missing branch failure was not reported: %s", output.String())
+	}
+}
+
+func TestPullWithResolvedUpstreamDoesNotQueryRemoteHeads(t *testing.T) {
+	f := newFixture(t)
+	write(t, filepath.Join(f.seed, "latest.txt"), "tracked upstream\n")
+	runGit(t, f.seed, "add", ".")
+	runGit(t, f.seed, "commit", "-m", "upstream update")
+	runGit(t, f.seed, "push")
+	realGit, err := exec.LookPath("git")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bin := testDir(t)
+	wrapper := filepath.Join(bin, "git")
+	write(t, wrapper, "#!/bin/sh\nif [ \"$3\" = ls-remote ]; then echo unexpected-remote-probe >&2; exit 97; fi\nexec \"$REAL_GIT\" \"$@\"\n")
+	if err := os.Chmod(wrapper, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("REAL_GIT", realGit)
+	t.Setenv("PATH", bin+string(os.PathListSeparator)+os.Getenv("PATH"))
+	var output bytes.Buffer
+	repo, err := Open(f.work, &output, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Pull(); err != nil {
+		t.Fatalf("tracked pull queried remote heads or failed: %v\n%s", err, output.String())
+	}
+	if got := read(t, filepath.Join(f.work, "latest.txt")); got != "tracked upstream\n" {
+		t.Fatalf("latest upstream content = %q", got)
+	}
+}
+
 func TestPullMergesConfiguredDivergenceAndPreservesPendingWork(t *testing.T) {
 	f := newFixture(t)
 	runGit(t, f.work, "config", "pull.rebase", "false")

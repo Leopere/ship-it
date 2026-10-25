@@ -48,7 +48,10 @@ func (r *Repo) HasRemotes() (bool, error) {
 }
 
 func (r *Repo) Pull() error {
-	if _, err := r.output("rev-parse", "--verify", "HEAD^{commit}"); err != nil {
+	// Existing local history can come from another remote. Until the selected
+	// upstream resolves locally, an empty publication remote still needs its
+	// first push rather than a pull. Normal tracked pulls avoid a remote probe.
+	if _, err := r.output("rev-parse", "--verify", "@{upstream}^{commit}"); err != nil {
 		branch, err := r.output("symbolic-ref", "--quiet", "--short", "HEAD")
 		if err != nil {
 			return err
@@ -65,7 +68,7 @@ func (r *Repo) Pull() error {
 		if err != nil {
 			return err
 		}
-		// A new repository has nothing to pull until its first commit is pushed.
+		// An empty remote has nothing to pull, even when local history exists.
 		if strings.TrimSpace(refs) == "" {
 			return nil
 		}
